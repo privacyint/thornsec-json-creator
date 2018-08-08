@@ -79,6 +79,8 @@ $( function() {
     	'settings', networkData
     )
     .click(function() {
+    	//If the target is not the networkLayout, do not update details
+    	if(e.target != this) return;
 		updateDetailsPane($('#networkLayout'));
     });
 
@@ -140,7 +142,7 @@ $( function() {
 });
 
 function updateDetailsPane(device) {
-	$('#infoPane').html('');
+	$('#infoPane').html('<h1>' + device.attr('id') + '</h1>');
 
 	$.each($(device).data('settings'), function (setting, val) {
 		var settingTextBox = $(document.createElement('div'));
@@ -161,6 +163,24 @@ function updateDetailsPane(device) {
 			settingTextBox.appendTo('#infoPane');
 		}		
 	});
+
+	//Adding a button to delete a device (not the network)
+	if(device.attr('id') != 'networkLayout'){
+		var deleteDeviceButton = $('<button/>', {
+	        text: "Delete this device",
+	        id: 'delete_button',
+	        class: 'ui-button ui-widget ui-corner-all',
+			click: function(){
+				deleteDevice(device);
+			}
+	    });
+		deleteDeviceButton.appendTo('#infoPane');	
+	}
+}
+
+function deleteDevice(device){
+	device.remove();
+	$('#infoPane').empty();
 }
 
 function serverInheritDefault(server) {
