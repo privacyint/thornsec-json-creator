@@ -13,18 +13,19 @@
 		<script src="external/jquery/jquery.min.js"></script>
 		<script src="jquery-ui.js"></script>
 		<script src="external/jquery.steps/jquery.steps.min.js"></script>
+		<script src="external/jquery.validate/jquery.validate.min.js"></script>
 
 		<script src="objects.js"></script>
 		<script src="logic.js"></script>
 	</head>
 	<body>
-		<div id="wizard" style="display: none">
+		<form id="wizard" style="display: none">
 		    <h2>Introduction</h2>
 		    <section>Thornsec is an auditing framework yadda yadda</section>
 
 			<h2>Getting Started</h2>
 			<section>
-				<form id="gettingStartedForm">
+				<div id="gettingStartedForm">
 					<div class="accordion">
 						<h3>Network Layout</h3>
 						<div>
@@ -45,25 +46,25 @@
 							</div>
 			    		</div>
 					</div>
-				</form>
+				</div>
 			</section>
 		    <h2>Network Settings</h2>
 		    <section>
-		    	<form id="networkDefaultsForm">
+		    	<div id="networkDefaultsForm" action="#">
 	    			<div class="accordion">
 	    				<h3>Mandatory Settings</h3>
 	    				<div>
 			    			<div>
 			    				<label for="network_name">Network Name</label>
-			    				<input type="text" id="network_name" name="network_name" title="This is an identifier for your network.  It is used in DNS and alerting" placeholder="office">
+			    				<input type="text" id="network_name" name="network_name" title="This is an identifier for your network.  It is used in DNS and alerting" placeholder="office" class="required">
 			    			</div>
 			    			<div>
 			    				<label for="network_domain">Network Domain</label>
-			    				<input type="text" id="network_domain" name="network_domain" title="This is your network's primary domain.  It is used both for internal DNS and for generating emails to your users" placeholder="myorganisation.com">
+			    				<input type="text" id="network_domain" name="network_domain" title="This is your network's primary domain.  It is used both for internal DNS and for generating emails to your users" placeholder="myorganisation.com" class="required">
 			    			</div>
 			    			<div>
 			    				<label for="network_ip">Configuration IP Address</label>
-			    				<input type="text" id="network_ip" name="network_ip" title="This is the IP address Thornsec should use for connecting to your network.  This will be either your router's internal IP address, or your public IP address" placeholder="10.0.1.1">
+			    				<input type="text" id="network_ip" name="network_ip" title="This is the IP address Thornsec should use for connecting to your network.  This will be either your router's internal IP address, or your public IP address" placeholder="10.0.1.1" class="required">
 			    			</div>
 			    			<div>
 			    				<label for="network_gpg">GPG Key ID</label>
@@ -71,7 +72,7 @@
 			    			</div>
 			    			<div>
 			    				<label for="network_adminemail">Admin Email Address</label>
-			    				<input type="email" id="network_adminemail" name="network_adminemail" title="Email address of your admin.  This is used as the sender address for emails to users, and the recipient for email alerts" placeholder="admin@myorganisation.com">
+			    				<input type="email" id="network_adminemail" name="network_adminemail" title="Email address of your admin.  This is used as the sender address for emails to users, and the recipient for email alerts" placeholder="admin@myorganisation.com" class="required">
 			    			</div>
 			    		</div>
 		    			<h3>Optional Settings (with defaults)</h3>
@@ -117,17 +118,17 @@
 			    			</div>
 			    		</div>
 		    		</div>
-		    	</form>
+		    	</div>
 		    </section>
    		    <h2>Default Server Settings</h2>
 		    <section>
-		    	<form id="serverDefaultsForm">
+		    	<div id="serverDefaultsForm">
 		    		<div class="accordion">
 		    			<h3>Default SSH Settings</h3>
 		    			<div>
 			    			<div>
 			    				<label for="server_myuser">Username</label>
-			    				<input type="text" id="server_myuser" name="server_myuser" title="The default SSH username used to connect to services" value="thornsec">
+			    				<input type="text" id="server_myuser" name="server_myuser" title="The default SSH username used to connect to services" value="thornsec" class="required">
 			    			</div>
 			    			<div>
 			    				<label for="server_connection">Connection Type</label>
@@ -243,12 +244,15 @@
 			    			</div>			    		
 			    		</div>
 					</div>
-				</form>
+				</div>
 		    </section>
-		</div>
+		</form>
 		<div id="content">
 			<div class="column-left">
-				<div id="deviceToolbox"> </div>
+				<div id="deviceToolbox">
+					<h3>Devices</h3>
+					<p>Double click or drag and drop to add a device</p>
+				</div>
 			</div>
 			<div class="column-centre">
 				<div id="networkLayout"> </div>

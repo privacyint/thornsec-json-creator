@@ -16,7 +16,10 @@ $( function() {
 		$('<div>New ' + val + '</div>')
 		.appendTo( '#deviceToolbox' )
 		.addClass(key)
-		.addClass('draggable');
+		.addClass('draggable')
+		.dblclick(function(event){
+			createDevice($('#networkLayout'),$(this));
+		});
 	});
 
 	//Make everything with the class "draggable" be actually draggable
@@ -31,43 +34,7 @@ $( function() {
 	$('#networkLayout').droppable( {
 		drop: function(event, ui) {
 			if ($(ui.helper).hasClass('ui-dialog')) { return false; }
-			if(!$(ui.helper).hasClass('dropped')){
-				var name = prompt('give me a name!');
-
-				var newDiv = $(ui.helper).clone(false)
-					.data('clone', true)
-					.attr('id', name)
-					.addClass('dropped')
-					.draggable( { revert: 'invalid', } );
-
-				if (newDiv.hasClass('router')) { 
-					newDiv.html(name + ' <i>(' + networkDevices.router + ')</i>');
-					newDiv.data('settings', serverInheritDefault(new Router(name, prompt('give me a subnet!'))));
-				}
-				else if (newDiv.hasClass('metal')) { 
-					newDiv.html(name + ' <i>(' + networkDevices.metal + ')</i>');
-					newDiv.data('settings', serverInheritDefault(new Metal(name, prompt('give me a subnet!'))));
-				}
-				else if (newDiv.hasClass('service')) { 
-					newDiv.html(name + ' <i>(' + networkDevices.service + ')</i>');
-					newDiv.data('settings', serverInheritDefault(new Service(name, prompt('give me a subnet!'))));
-
-				}
-				else if (newDiv.hasClass('internalonly')) { 
-					newDiv.html(name + ' <i>(' + networkDevices.internalonly + ')</i>');
-					newDiv.data('settings', new InternalOnlyDevice(name));
-				}
-				else if (newDiv.hasClass('externalonly')) { 
-					newDiv.html(name + ' <i>(' + networkDevices.externalonly + ')</i>');
-					newDiv.data('settings', new ExternalOnlyDevice(name));
-				}
-				else if (newDiv.hasClass('user')) { 
-					newDiv.html(name + ' <i>(' + networkDevices.user + ')</i>');
-					newDiv.data('settings', new UserDevice(name));
-				}
-
-				$(this).append(newDiv);
-			}
+			if(!$(ui.helper).hasClass('dropped')){ createDevice($(this), $(ui.helper)) }
 			else {
 				$(this).append(ui.draggable);
 			}
@@ -78,7 +45,7 @@ $( function() {
     $('#networkLayout').data(
     	'settings', networkData
     )
-    .click(function() {
+    .click(function(e) {
     	//If the target is not the networkLayout, do not update details
     	if(e.target != this) return;
 		updateDetailsPane($('#networkLayout'));
@@ -93,11 +60,23 @@ $( function() {
     var winWidth  = $(window).width() * 0.5;
     var winHeight = $(window).height();
     //Show the wizard!
-    $('#wizard').steps({
+    var wizard = $('#wizard').show();
+    wizard.steps({
         headerTag: 'h2',
         bodyTag: 'section',
         transitionEffect: 'slideLeft',
-        stepsOrientation: 'vertical'
+        stepsOrientation: 'vertical',
+        onStepChanging: function (event)
+	    {
+	        wizard.validate().settings.ignore = ":disabled,:hidden";
+	        return wizard.valid();
+	    },
+        onFinishing: function (event, currentIndex){
+	        return wizard.valid();
+	    },
+	    onFinished: function (event, currentIndex){
+	        $(this).dialog('close');
+	    }
     })
 	.dialog({
     	modal: true,
@@ -105,7 +84,7 @@ $( function() {
     	title: 'Thornsec for the masses',
     	width: winWidth,
     	height: winHeight
-    });
+    });	
 
     $('[title]').tooltip({
 		position: {
@@ -125,6 +104,12 @@ $( function() {
 		networkData[property] = e.target.value;
 	});
 
+	//populating the defaultServerData with pre-entered info
+	$('#serverDefaultsForm :input').each(function(e) {
+		var property = (this.id.split('_')[1]);
+		defaultServerData[property] = $(this).val();
+	});
+
 	$('#serverDefaultsForm').on('input', function(e) {
 		var property = ((e.target.id).split('_')[1]);
 		defaultServerData[property] = e.target.value;
@@ -141,8 +126,47 @@ $( function() {
 
 });
 
+function createDevice(network, device){
+	var name = prompt('give me a name!');
+
+	var newDiv = device.clone(false)
+		.data('clone', true)
+		.attr('id', name)
+		.addClass('dropped')
+		.draggable( { revert: 'invalid', } );
+
+	if (newDiv.hasClass('router')) { 
+		newDiv.html(name + ' <i>(' + networkDevices.router + ')</i>');
+		newDiv.data('settings', serverInheritDefault(new Router(name, prompt('give me a subnet!'))));
+	}
+	else if (newDiv.hasClass('metal')) { 
+		newDiv.html(name + ' <i>(' + networkDevices.metal + ')</i>');
+		newDiv.data('settings', serverInheritDefault(new Metal(name, prompt('give me a subnet!'))));
+	}
+	else if (newDiv.hasClass('service')) { 
+		newDiv.html(name + ' <i>(' + networkDevices.service + ')</i>');
+		newDiv.data('settings', serverInheritDefault(new Service(name, prompt('give me a subnet!'))));
+
+	}
+	else if (newDiv.hasClass('internalonly')) { 
+		newDiv.html(name + ' <i>(' + networkDevices.internalonly + ')</i>');
+		newDiv.data('settings', new InternalOnlyDevice(name));
+	}
+	else if (newDiv.hasClass('externalonly')) { 
+		newDiv.html(name + ' <i>(' + networkDevices.externalonly + ')</i>');
+		newDiv.data('settings', new ExternalOnlyDevice(name));
+	}
+	else if (newDiv.hasClass('user')) { 
+		newDiv.html(name + ' <i>(' + networkDevices.user + ')</i>');
+		newDiv.data('settings', new UserDevice(name));
+	}
+
+	network.append(newDiv);
+	updateDetailsPane(newDiv);
+}
+
 function updateDetailsPane(device) {
-	$('#infoPane').html('<h1>' + device.attr('id') + '</h1>');
+	$('#infoPane').html('<h3>' + device.attr('id') + '</h3>');
 
 	$.each($(device).data('settings'), function (setting, val) {
 		var settingTextBox = $(document.createElement('div'));
@@ -183,16 +207,18 @@ function deleteDevice(device){
 	$('#infoPane').empty();
 }
 
+
 function serverInheritDefault(server) {
 	var skip = [ 'hostname',
 				 'subnet'
 			   ];
 
 	$.each($(server).data('settings'), function (setting, val) {
+		console.
 		if (val === Object(val)) {
 		}
 		else {
-			if (val != $(defaultServerData).data('settings')[setting]) {
+			if (val != $(defaultServerData).data('settings')[setting]) {				
 				$(server).data('settings')[setting] = $(defaultServerData).data('settings')[setting];
 			}
 		}		
