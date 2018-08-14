@@ -214,7 +214,6 @@ function serverInheritDefault(server) {
 			   ];
 
 	$.each($(server).data('settings'), function (setting, val) {
-		console.
 		if (val === Object(val)) {
 		}
 		else {
