@@ -51,11 +51,6 @@ $( function() {
 		updateDetailsPane($('#networkLayout'));
     });
 
-	//As do objects on the network
-    $('#networkLayout').on('click mouseup', '.dropped', function() {
-		updateDetailsPane($(this));
-    });
-
     //Annoyingly, dialogs cannot be given percentages, so calculate them up here!
     var winWidth  = $(window).width() * 0.5;
     var winHeight = $(window).height();
@@ -161,6 +156,11 @@ function createDevice(network, device){
 		newDiv.data('settings', new UserDevice(name));
 	}
 
+	//Make the new device selectable
+	newDiv.on('click mouseup', function() {
+		updateDetailsPane($(this));
+    });
+
 	network.append(newDiv);
 	updateDetailsPane(newDiv);
 }
@@ -179,10 +179,15 @@ function updateDetailsPane(device) {
 		}
 		else {
 			settingTextBox.after().html('<label>' + setting + ': </label><input type="text" name="textbox_' + setting + '" id="textbox_' + setting + '" value="' + val + '" >');
+
+			//update device's setting when modified
+			settingTextBox.on('input', 'input', function(e) {
+				$(device).data('settings')[setting] = this.value;
+			});
     		
-    		$('#infoPane').on('change', '#textbox_' + setting, function() {
-       			$(device).data('settings')[setting] = this.value;
-	    	});
+    		// $('#infoPane').on('change', '#textbox_' + setting, function() {
+	     	//		$(device).data('settings')[setting] = this.value;
+	    	// });
 			
 			settingTextBox.appendTo('#infoPane');
 		}		
@@ -214,7 +219,6 @@ function serverInheritDefault(server) {
 			   ];
 
 	$.each($(server).data('settings'), function (setting, val) {
-		console.
 		if (val === Object(val)) {
 		}
 		else {
