@@ -16,24 +16,23 @@ $( function() {
 		$('<div>New ' + val + '</div>')
 		.appendTo( '#deviceToolbox' )
 		.addClass(key)
-		.addClass('draggable')
+		.addClass('model')
 		.dblclick(function(event){
 			createDevice($('#networkLayout'),$(this));
 		});
 	});
 
-	//Make everything with the class "draggable" be actually draggable
-	$( function() {
-		$('.draggable').draggable({
-			helper: 'clone',
-			revert: 'invalid',
-		});
+	$(".model").click(function(event){
+		createDevice($('#networkLayout'),$(this));
 	});
 	
     //Make sure we can drop properly
 	$('#networkLayout').droppable( {
+        over: function(event, ui) {
+            var $this = $(this);
+        },
 		drop: function(event, ui) {
-			if ($(ui.helper).hasClass('ui-dialog')) { return false; }
+			if ($(ui.helper).hasClass('ui-dialog') || $(ui.helper).hasClass('service')) { return false; }
 			if(!$(ui.helper).hasClass('dropped')){ createDevice($(this), $(ui.helper)) }
 			else {
 				$(this).append(ui.draggable);
@@ -51,35 +50,26 @@ $( function() {
 		updateDetailsPane($('#networkLayout'));
     });
 
-    //Annoyingly, dialogs cannot be given percentages, so calculate them up here!
-    var winWidth  = $(window).width() * 0.5;
-    var winHeight = $(window).height();
     //Show the wizard!
-    var wizard = $('#wizard').show();
-    wizard.steps({
+    var wizardModal = $('#wizard-modal').modal('show');
+    var wizardForm = $('#wizard-form');
+    wizardForm.steps({
         headerTag: 'h2',
         bodyTag: 'section',
         transitionEffect: 'slideLeft',
         stepsOrientation: 'vertical',
         onStepChanging: function (event)
 	    {
-	        wizard.validate().settings.ignore = ":disabled,:hidden";
-	        return wizard.valid();
+	        wizardForm.validate().settings.ignore = ":disabled,:hidden";
+	        return wizardForm.valid();
 	    },
         onFinishing: function (event, currentIndex){
-	        return wizard.valid();
+	        return wizardForm.valid();
 	    },
 	    onFinished: function (event, currentIndex){
-	        $(this).dialog('close');
+	        wizardModal.modal('hide');
 	    }
-    })
-	.dialog({
-    	modal: true,
-    	autoOpen: true,
-    	title: 'Thornsec for the masses',
-    	width: winWidth,
-    	height: winHeight
-    });	
+    });
 
     $('[title]').tooltip({
 		position: {
@@ -87,11 +77,6 @@ $( function() {
 			at: 'right+5 top-5',
 			collision: 'none'
 		}
-	});
-
-	$('.accordion').accordion({
-		collapsible: true,
-		heightStyle: "content",
 	});
 
 	$('#networkDefaultsForm').on('input', function(e) {
@@ -123,36 +108,39 @@ $( function() {
 
 function createDevice(network, device){
 	var name = prompt('give me a name!');
+	//Cancel if no name entered
+	if(name == null || name == ""){ return false;}
 
 	var newDiv = device.clone(false)
 		.data('clone', true)
 		.attr('id', name)
-		.addClass('dropped')
-		.draggable( { revert: 'invalid', } );
+		.addClass('card text-white added bg-dark shadow')
+		.removeClass('model ui-draggable-dragging btn btn-primary');
+
+	console.log(networkDevices);
 
 	if (newDiv.hasClass('router')) { 
-		newDiv.html(name + ' <i>(' + networkDevices.router + ')</i>');
+		newDiv.html('<div class="card-header">' + name + '<i>(' + networkDevices.router + ')</i></div>');
 		newDiv.data('settings', serverInheritDefault(new Router(name, prompt('give me a subnet!'))));
 	}
 	else if (newDiv.hasClass('metal')) { 
-		newDiv.html(name + ' <i>(' + networkDevices.metal + ')</i>');
+		newDiv.html('<div class="card-header">' + name + '<i>(' + networkDevices.metal + ')</i></div>');
 		newDiv.data('settings', serverInheritDefault(new Metal(name, prompt('give me a subnet!'))));
 	}
 	else if (newDiv.hasClass('service')) { 
-		newDiv.html(name + ' <i>(' + networkDevices.service + ')</i>');
+		newDiv.html('<div class="card-header">' + name + '<i>(' + networkDevices.service + ')</i></div>');
 		newDiv.data('settings', serverInheritDefault(new Service(name, prompt('give me a subnet!'))));
-
 	}
 	else if (newDiv.hasClass('internalonly')) { 
-		newDiv.html(name + ' <i>(' + networkDevices.internalonly + ')</i>');
+		newDiv.html('<div class="card-header">' + name + '<i>(' + networkDevices.internal + ')</i></div>');
 		newDiv.data('settings', new InternalOnlyDevice(name));
 	}
 	else if (newDiv.hasClass('externalonly')) { 
-		newDiv.html(name + ' <i>(' + networkDevices.externalonly + ')</i>');
+		newDiv.html('<div class="card-header">' + name + '<i>(' + networkDevices.external + ')</i></div>');
 		newDiv.data('settings', new ExternalOnlyDevice(name));
 	}
 	else if (newDiv.hasClass('user')) { 
-		newDiv.html(name + ' <i>(' + networkDevices.user + ')</i>');
+		newDiv.html('<div class="card-header">' + name + '<i>(' + networkDevices.user + ')</i></div>');
 		newDiv.data('settings', new UserDevice(name));
 	}
 
@@ -160,6 +148,24 @@ function createDevice(network, device){
 	newDiv.on('click mouseup', function() {
 		updateDetailsPane($(this));
     });
+
+	//If the device is a server or router, make things droppable on it
+	if(newDiv.hasClass('metal')){
+		var buttons = "<div class='server_device bg-secondary mb-1 p-1'>Add new VM</div><div class='server_device bg-secondary p-1'>Add Router</div>"
+		newDiv.append(buttons);
+		newDiv.droppable( {
+	        over: function(event, ui) {
+	            var $this = $(this);
+	        },
+			drop: function(event, ui) {
+				if ($(ui.helper).hasClass('ui-dialog')) { return false; }
+				if(!$(ui.helper).hasClass('dropped')){ createDevice($(this), $(ui.helper)) }
+				else {
+					$(this).append(ui.draggable);
+				}
+			}
+		});
+	}
 
 	network.append(newDiv);
 	updateDetailsPane(newDiv);

@@ -1,0 +1,415 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<title>Thornsec Network Generation Tool</title>
+	<meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">	
+
+	<link rel="stylesheet" type="text/css" href="jquery-ui.min.css">
+	<link rel="stylesheet" type="text/css" href="jquery-ui.theme.min.css">
+	<link rel="stylesheet" type="text/css" href="external/jquery.steps/jquery.steps.css">
+
+	<link rel="stylesheet" type="text/css" href="style.css">
+	<link rel="stylesheet" type="text/css" href="external/bootstrap-4.1.3-dist/css/bootstrap-grid.min.css">
+	<link rel="stylesheet" type="text/css" href="external/bootstrap-4.1.3-dist/css/bootstrap-reboot.min.css">
+	<link rel="stylesheet" type="text/css" href="external/bootstrap-4.1.3-dist/css/bootstrap.min.css">
+
+	<script src="external/jquery/jquery.min.js"></script>
+	<script src="jquery-ui.js"></script>
+	<script src="external/jquery.steps/jquery.steps.min.js"></script>
+	<script src="external/jquery.validate/jquery.validate.min.js"></script>
+
+	<script src="external/bootstrap-4.1.3-dist/js/bootstrap.bundle.min.js"></script>
+	<script src="external/bootstrap-4.1.3-dist/js/bootstrap.min.js"></script>
+
+	<script src="objects.js"></script>
+	<script src="logic.js"></script>
+</head>
+<body>
+	<div class="container">
+		<header class="py-3">
+			<div class="row flex-nowrap justify-content-between align-items-center">
+				<div class="col-12 text-center">
+					<h1>Thornsec JSON Creator</h1>
+					<button class="btn btn-primary">Import</button>
+					<button class="btn btn-primary">Save</button>
+				</div>
+			</div>
+		</header>
+
+		<!-- WIZARD -->
+		<div class="modal fade" id="wizard-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+			<div class="modal-dialog modal-lg" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title" id="exampleModalLabel">Thornsec First Steps - Network</h5>
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+					</div>
+					<div class="modal-body">
+						<form id="wizard-form"">
+							<h2>Introduction</h2>
+							<section style="padding:2.5%">
+								<p>Thornsec is an auditing framework yadda yadda<p>
+								</section>
+
+								<h2>Getting Started</h2>
+								<section>
+									<div id="gettingStartedForm">
+										<div class="accordion" id="gettingStartedAccordion">
+											<div class="card">
+												<div class="card-header" id="headingOne">
+													<h5 class="mb-0">
+														<button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+															Network Layout
+														</button>
+													</h5>
+												</div>
+
+												<div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-target="#gettingStartedAccordion">
+													<div class="card-body">
+														<div>
+															<label for="step1_type">Blah blah blah internal or external</label>
+															<select id="step1_type" name="step1_type" title="">
+																<option value="a">Office Network</option>
+																<option value="b">External Server</option>
+															</select>
+														</div>
+														<div>
+															<label for="step1_extconnection">Connected to the outside world</label>
+															<select id="step1_extconnection" name="step1_extconnection" title="">
+																<option value="ppp">PPPoE</option>
+																<option value="dhcp">DHCP</option>
+																<option value="static">Static IP(s)</option>
+															</select>
+														</div>
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+								</section>
+								<h2>Network Settings</h2>
+								<section>
+									<div id="networkDefaultsForm" action="#">
+										<div class="accordion" id="NetworkSettingsAccordion">
+											<div class="card">
+												<div class="card-header" id="headingOne">
+													<h5 class="mb-0">
+														<button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+															Mandatory Settings
+														</button>
+													</h5>
+												</div>
+
+												<div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-target="#NetworkSettingsAccordion">
+													<div class="card-body">
+														<div>
+															<label for="network_name">Network Name</label>
+															<input type="text" id="network_name" name="network_name" title="This is an identifier for your network.  It is used in DNS and alerting" placeholder="office" class="required">
+														</div>
+														<div>
+															<label for="network_domain">Network Domain</label>
+															<input type="text" id="network_domain" name="network_domain" title="This is your network's primary domain.  It is used both for internal DNS and for generating emails to your users" placeholder="myorganisation.com" class="required">
+														</div>
+														<div>
+															<label for="network_ip">Configuration IP Address</label>
+															<input type="text" id="network_ip" name="network_ip" title="This is the IP address Thornsec should use for connecting to your network.  This will be either your router's internal IP address, or your public IP address" placeholder="10.0.1.1" class="required">
+														</div>
+														<div>
+															<label for="network_gpg">GPG Key ID</label>
+															<input type="email" id="network_gpg" name="network_gpg" title="This is the ID of the GPG key to use when storing/accessing passwords for the network" placeholder="user@myorganisation.com">
+														</div>
+														<div>
+															<label for="network_adminemail">Admin Email Address</label>
+															<input type="email" id="network_adminemail" name="network_adminemail" title="Email address of your admin.  This is used as the sender address for emails to users, and the recipient for email alerts" placeholder="admin@myorganisation.com" class="required">
+														</div>
+													</div>
+												</div>
+											</div>
+											<div class="card">
+												<div class="card-header" id="headingTwo">
+													<h5 class="mb-0">
+														<button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+															Optional Settings (with defaults)
+														</button>
+													</h5>
+												</div>
+												<div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-target="#NetworkSettingsAccordion">
+													<div class="card-body">
+														<div>
+															<label for="network_class">LAN IP Address Range</label>
+															<select id="network_class" name="network_class" title="IP address range to use">
+																<option value="a">A - 10.0.X.X</option>
+																<option value="b">B - 172.16.X.X</option>
+																<option value="c">C - 192.168.X.X</option>
+															</select>
+														</div>
+														<div>
+															<label for="network_dns">Upstream DNS Provider</label>
+															<select id="network_dns" name="network_dns" title="Which upstream DNS provider to use">
+																<option value="">OpenDNS</option>
+																<option value="1.1.1.1;1.0.0.1">Cloudflare</option>
+																<option value="8.8.8.8;8.4.4.8">Google</option>
+															</select>
+														</div>
+														<div>
+															<label for="network_dtls">Use TLS for upstream DNS? (Recommended!)</label>
+															<input type="checkbox" id="network_dtls" name="network_dtls" title="Should we encrypt your external DNS requests using TLS? (Please bear in mind, this requires the end service provider ot support this capability"">
+														</div>
+														<div>
+															<label for="network_vmbase">Virtual Machines Base Directory</label>
+															<input type="text" id="network_vmbase" name="network_vmbase" title="This is where your hypervisor should store all files relating to your VMs" value="/media/VMs">
+														</div>
+													</div>
+												</div>
+											</div>
+											<div class="card">
+												<div class="card-header" id="headingThree">
+													<h5 class="mb-0">
+														<button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+															"Advanced" Settings (Experimental)
+														</button>
+													</h5>
+												</div>
+												<div id="collapseThree" class="collapse" aria-labelledby="headingThree" data-target="#NetworkSettingsAccordion">
+													<div class="card-body">
+														<div>
+															<label for="network_vpnonly">Internal services VPN only (Disabled)</label>
+															<input type="checkbox" id="network_vpnonly" name="network_vpnonly" title="Should your users be required to be on VPN to be able to use your network? (Disabled)" value="readonly" disabled>
+														</div>
+														<div>
+															<label for="network_adblocking">Enforce adblocking</label>
+															<input type="checkbox" id="network_adblocking" name="network_adblocking" title="Should we enforce ad blocking on the router?  Be wary, as this is a blunt instrument, and may cause unintended effects for your users">
+														</div>
+														<div>
+															<label for="network_autogenpasswds">Autogenerate VM passwords</label>
+															<input type="checkbox" id="network_autogenpasswds" name="network_autogenpasswds" title="Should Thornsec automatically generate and store passwords for your VMs?  You almost certainly don't want this...">
+														</div>
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+								</section>
+								<h2>Default Server Settings</h2>
+								<section>
+									<div id="serverDefaultsForm">
+										<div class="accordion" id="ServerSettingsAccordion">
+											<div class="card">
+												<div class="card-header" id="headingOne">
+													<h5 class="mb-0">
+														<button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+															Default SSH Settings
+														</button>								    			
+													</h5>
+												</div>
+
+												<div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-target="#ServerSettingsAccordion">
+													<div class="card-body">
+														<div>
+															<div>
+																<label for="server_myuser">Username</label>
+																<input type="text" id="server_myuser" name="server_myuser" title="The default SSH username used to connect to services" value="thornsec" class="required">
+															</div>
+															<div>
+																<label for="server_connection">Connection Type</label>
+																<select id="server_connection" name="server_connection" title="Type of SSH connection to use to connect to services on the network">
+																	<option value="direct" title="Connect to services directly, using their IP address">Direct</option>
+																	<option value="tunnelled" title="Tunnel SSH connections via the IP address set in the previous section">Tunnelled</option>
+																</select>
+															</div>
+															<div>
+																<label for="server_sshport">Listening Port</label>
+																<input type="number" id="server_sshport" name="server_sshport" min="0" max="65535" title="Default port for the SSH daemons to listen on" value="22">
+															</div>
+															<div>
+																<label for="server_adminport">Connection Port</label>
+																<input type="number" id="server_adminport" name="server_adminport" min="0" max="65535" title="Default port for the SSH client to try to connect to.  You almost certainly want this to be the same as the listening port" value="22">
+															</div>
+															<div>
+																<label for="server_sshsource">Restrict SSH logins to IPs (Disabled)</label>
+																<input type="text" id="server_sshsource" name="server_sshsource" title="Lock down SSH logins to the following source IP addresses (Disabled)" value="" disabled>
+															</div>
+														</div>
+													</div>
+												</div>
+											</div>
+											<div class="card">
+												<div class="card-header" id="headingTwo">
+													<h5 class="mb-0">
+														<button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+															Updates
+														</button>
+													</h5>
+
+												</div>
+												<div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-target="#ServerSettingsAccordion">
+													<div class="card-body">
+														<div>
+															<div>
+																<label for="server_updates">Servers should automatically run any available updates on audit/configure</label>
+																<input type="checkbox" id="server_updates" name="server_updates" title="By default, you probably don't want Thornsec to automatically update services it connects to - this process should (probably) be done manually for now.">
+															</div>
+														</div>
+													</div>
+												</div>
+											</div>
+											<div class="card">
+												<div class="card-header" id="headingThree">
+													<h5 class="mb-0">
+														<button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+															VM Defaults
+														</button>
+													</h5>
+												</div>
+												<div id="collapseThree" class="collapse" aria-labelledby="headingThree" data-target="#ServerSettingsAccordion">
+													<div class="card-body">
+														<div>
+															<div>
+																<label for="server_iface">Network Interface</label>
+																<input type="text" id="server_iface" name="server_iface" title="The default ethernet interface to be used by services. You almost certainly don't actually want to change this!" value="enp0s3">
+															</div>
+															<div>
+																<label for="server_ram">RAM (mb)</label>
+																<input type="number" id="server_ram" name="server_ram" min="128" title="The default amount of RAM to give to each service. You will want at *least* 512 here, if not more" value="1024">
+															</div>
+															<div>
+																<label for="server_cpus">CPUs</label>
+																<input type="number" id="server_cpus" name="server_cpus" min="1" title="The default number of CPUs to give to each service. You should ideally set this to the number of cores on the hypervisor" value="1">
+															</div>
+															<div>
+																<label for="server_disksize">OS Disk Size (mb)</label>
+																<input type="number" id="server_disksize" name="server_disksize" min="2048" title="The default amount of disk space to give the Operating System for each service.  This doesn't include data storage.  The disk itself grows dynamically, so will only take up as much space as the files within it" value="8096">
+															</div>
+															<div>
+																<label for="server_datadisksize">Data Disk Size (mb)</label>
+																<input type="number" id="server_datadisksize" name="server_datadisksize" min="2048" title="The default amount of disk space for *data* on each service.  The disk itself grows dynamically, so will only take up as much space as the files within it" value="8096">
+															</div>
+															<div>
+																<label for="server_debianisourl">Debian ISO</label>
+																<input type="text" id="server_debianisourl" name="server_debianisourl" title="The URI of the Debian install ISO. Check https://cdimage.debian.org/debian-cd/current/amd64/iso-cd/ for the latest version" value="cdimage.debian.org/debian-cd/current/amd64/iso-cd/debian-9.5.0-amd64-netinst.iso">
+															</div>
+															<div>
+																<label for="server_debianisosha512">Debian ISO SHA512SUM</label>
+																<input type="text" id="server_debianisosha512" name="server_debianisosha512" title="The SHA512SUM of the Debian install ISO. Check https://cdimage.debian.org/debian-cd/current/amd64/iso-cd/SHA512SUMS for the latest" value="efe75000c066506326c74a97257163b3050d656a5be8708a6826b0f810208d0a58f413c446de09919c580de8fac6d0a47774534725dd9fdd00c94859e370f373">
+															</div>
+															<label for="server_debianmirror">Debian Mirror</label>
+															<select id="server_debianmirror" name="server_debianmirror" title="The Debian Mirror to use for updates. Choose the one geographically closest to you for the best speeds.">
+																<option value="ftp.am.debian.org">Armenia</option>
+																<option value="ftp.au.debian.org">Australia</option>
+																<option value="ftp.at.debian.org">Austria</option>
+																<option value="ftp.by.debian.org">Belarus</option>
+																<option value="ftp.be.debian.org">Belgium</option>
+																<option value="ftp.br.debian.org">Brazil</option>
+																<option value="ftp.bg.debian.org">Bulgaria</option>
+																<option value="ftp.ca.debian.org">Canada</option>
+																<option value="ftp.cl.debian.org">Chile</option>
+																<option value="ftp.cn.debian.org">China</option>
+																<option value="ftp.hr.debian.org">Croatia</option>
+																<option value="ftp.cz.debian.org">Czech Republic</option>
+																<option value="ftp.dk.debian.org">Denmark</option>
+																<option value="ftp.sv.debian.org">El Salvador</option>
+																<option value="ftp.ee.debian.org">Estonia</option>
+																<option value="ftp.fi.debian.org">Finland</option>
+																<option value="ftp.fr.debian.org">France</option>
+																<option value="ftp.de.debian.org">Germany</option>
+																<option value="ftp.gr.debian.org">Greece</option>
+																<option value="ftp.hk.debian.org">Hong Kong</option>
+																<option value="ftp.hu.debian.org">Hungary</option>
+																<option value="ftp.is.debian.org">Iceland</option>
+																<option value="ftp.ie.debian.org">Ireland</option>
+																<option value="ftp.it.debian.org">Italy</option>
+																<option value="ftp.jp.debian.org">Japan</option>
+																<option value="ftp.kr.debian.org">Korea</option>
+																<option value="ftp.lt.debian.org">Lithuania</option>
+																<option value="ftp.mx.debian.org">Mexico</option>
+																<option value="ftp.md.debian.org">Moldova</option>
+																<option value="ftp.nl.debian.org">Netherlands</option>
+																<option value="ftp.nc.debian.org">New Caledonia</option>
+																<option value="ftp.nz.debian.org">New Zealand</option>
+																<option value="ftp.no.debian.org">Norway</option>
+																<option value="ftp.pl.debian.org">Poland</option>
+																<option value="ftp.pt.debian.org">Portugal</option>
+																<option value="ftp.ro.debian.org">Romania</option>
+																<option value="ftp.ru.debian.org">Russia</option>
+																<option value="ftp.sg.debian.org">Singapore</option>
+																<option value="ftp.sk.debian.org">Slovakia</option>
+																<option value="ftp.si.debian.org">Slovenia</option>
+																<option value="ftp.es.debian.org">Spain</option>
+																<option value="ftp.se.debian.org">Sweden</option>
+																<option value="ftp.ch.debian.org">Switzerland</option>
+																<option value="ftp.tw.debian.org">Taiwan</option>
+																<option value="ftp.tr.debian.org">Turkey</option>
+																<option value="ftp.ua.debian.org">Ukraine</option>
+																<option value="ftp.uk.debian.org" selected="selected">United Kingdom</option>
+																<option value="ftp.us.debian.org">United States</option>
+															</select>
+															<div>
+																<label for="server_debiandirectory">Debian Mirror Directory</label>
+																<input type="text" id="server_debiandirectory" name="server_debiandirectory" title="The bit which appears after the repo URI above" value="/debian">
+															</div>			    		
+														</div>
+													</div>
+												</div>
+											</div>
+										</div>
+									</section>
+								</form>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<!-- MAIN PAGE -->
+				<div class="col-md-12 mb-4 text-muted bg-light rounded border">
+					<div class="row">
+						<div class="col-md-8" id="network-container">
+							<div class="column">
+								<div class="p-3 row-md-4 border-bottom">
+									<div class="row">
+										<div class="col-md-6">
+											<h4 class="text-info">Network layout</h4>
+										</div>
+										<div class="col-md-6">
+											<div class="btn btn-secondary metal device model">Add Server</div>
+											<div class="btn btn-secondary router device model">Add Router</div>	
+										</div>
+									</div>
+									<div id="networkLayout"></div>
+								</div>
+								<div class="p-3 row-md-4 border-bottom">
+									<div class="row">
+										<div class="col-md-6">
+											<h4 class="text-info">Users</h4>
+										</div>
+										<div class="col-md-6">
+											<div class="btn btn-secondary user device model">Add User</div>
+										</div>
+									</div>
+									<div id="userLayout"></div>
+								</div>
+								<div class="p-3 row-md-4">
+									<div class="row">
+										<div class="col-md-6">
+											<h4 class="text-info">Devices</h4>
+										</div>
+										<div class="col-md-6">
+											<div class="btn btn-secondary internalonly device model">Add external device</div>
+											<div class="btn btn-secondary externalonly device model">Add internal device</div>
+										</div>
+									</div>
+									<div id="deviceLayout"></div>
+								</div>
+							</div>
+						</div>
+						<div class="p-3 col-md-4 border-left">
+							<div id="infoPane"></div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</body>
+		</html>
+
