@@ -6,37 +6,38 @@ var networkDevices = { 'router'  :'Router',
 					   'user'    :'User'
 					 };
 
+var serverDevices = { 'router'  :'Router',
+					   'service' :'VM',
+					 };
+
 var networkData = new Network('');
 
 var defaultServerData = new Machine('', '');
 
 $( function() {
-	//Iterate through available devices, spit them out into our toolbox
-	$.each(networkDevices, function(key, val) {
-		$('<div>New ' + val + '</div>')
-		.appendTo( '#deviceToolbox' )
-		.addClass(key)
-		.addClass('model')
-		.dblclick(function(event){
-			createDevice($('#networkLayout'),$(this));
-		});
+	$("#importButton").click(function(){
+	    parseJson();
 	});
 
+	//Make add buttons clickable
 	$(".model").click(function(event){
-		createDevice($('#networkLayout'),$(this));
+		createDevice($(this).attr("value"));
 	});
-	
-    //Make sure we can drop properly
+
+	//Network is droppable (only for routers coming from servers)
 	$('#networkLayout').droppable( {
+		accept: ".router",
         over: function(event, ui) {
             var $this = $(this);
         },
 		drop: function(event, ui) {
-			if ($(ui.helper).hasClass('ui-dialog') || $(ui.helper).hasClass('service')) { return false; }
-			if(!$(ui.helper).hasClass('dropped')){ createDevice($(this), $(ui.helper)) }
-			else {
-				$(this).append(ui.draggable);
-			}
+			ui.draggable.removeClass('bg-secondary m-1 server-device').addClass('device bg-dark shadow added card');
+			ui.draggable.css("position", "relative");
+
+			$(this).append(ui.draggable);
+		
+			//when dropped, replace it properly
+			ui.draggable.css({"top": "0", "left": "0"});
 		}
 	});
 
@@ -106,69 +107,118 @@ $( function() {
 
 });
 
-function createDevice(network, device){
+function createDevice(device, parent){
+	console.log(device);
+
 	var name = prompt('give me a name!');
 	//Cancel if no name entered
 	if(name == null || name == ""){ return false;}
 
-	var newDiv = device.clone(false)
+	var newDiv = $("#defaultDevice").clone(false)
 		.data('clone', true)
 		.attr('id', name)
-		.addClass('card text-white added bg-dark shadow')
-		.removeClass('model ui-draggable-dragging btn btn-primary');
+		.addClass('device ' + device)
+		.show();
 
-	console.log(networkDevices);
-
-	if (newDiv.hasClass('router')) { 
-		newDiv.html('<div class="card-header">' + name + '<i>(' + networkDevices.router + ')</i></div>');
-		newDiv.data('settings', serverInheritDefault(new Router(name, prompt('give me a subnet!'))));
-	}
-	else if (newDiv.hasClass('metal')) { 
-		newDiv.html('<div class="card-header">' + name + '<i>(' + networkDevices.metal + ')</i></div>');
-		newDiv.data('settings', serverInheritDefault(new Metal(name, prompt('give me a subnet!'))));
-	}
-	else if (newDiv.hasClass('service')) { 
-		newDiv.html('<div class="card-header">' + name + '<i>(' + networkDevices.service + ')</i></div>');
-		newDiv.data('settings', serverInheritDefault(new Service(name, prompt('give me a subnet!'))));
-	}
-	else if (newDiv.hasClass('internalonly')) { 
-		newDiv.html('<div class="card-header">' + name + '<i>(' + networkDevices.internal + ')</i></div>');
-		newDiv.data('settings', new InternalOnlyDevice(name));
-	}
-	else if (newDiv.hasClass('externalonly')) { 
-		newDiv.html('<div class="card-header">' + name + '<i>(' + networkDevices.external + ')</i></div>');
-		newDiv.data('settings', new ExternalOnlyDevice(name));
-	}
-	else if (newDiv.hasClass('user')) { 
-		newDiv.html('<div class="card-header">' + name + '<i>(' + networkDevices.user + ')</i></div>');
-		newDiv.data('settings', new UserDevice(name));
+	//If there is a parent it means this is inside a metal and should and have a different look
+	if(parent){
+		newDiv.addClass('bg-secondary server-device m-1').removeClass('mb-1 p-1 bg-dark shadow added card model');
 	}
 
-	//Make the new device selectable
-	newDiv.on('click mouseup', function() {
-		updateDetailsPane($(this));
-    });
-
-	//If the device is a server or router, make things droppable on it
-	if(newDiv.hasClass('metal')){
-		var buttons = "<div class='server_device bg-secondary mb-1 p-1'>Add new VM</div><div class='server_device bg-secondary p-1'>Add Router</div>"
-		newDiv.append(buttons);
-		newDiv.droppable( {
-	        over: function(event, ui) {
-	            var $this = $(this);
-	        },
-			drop: function(event, ui) {
-				if ($(ui.helper).hasClass('ui-dialog')) { return false; }
-				if(!$(ui.helper).hasClass('dropped')){ createDevice($(this), $(ui.helper)) }
-				else {
-					$(this).append(ui.draggable);
-				}
-			}
+	//If it is inside a server OR is a router, it should be draggable
+	if(newDiv.hasClass('router') || parent){
+		newDiv.draggable({
+			zIndex: 100,
+			revert : function(event, ui) {
+				//if not dropped over another server, come back to original position
+	            $(this).data("uiDraggable").originalPosition = {
+	                top : 0,
+	                left : 0
+	            };
+	            return !event;
+	        }
 		});
 	}
 
-	network.append(newDiv);
+	if(!parent){
+		var parent = $('#networkLayout');
+	}
+
+	//Defining classes and properties for each device
+	if (device == 'router') { 
+		newDiv.html('<div class="card-header">' + name + '<i>(' + networkDevices.router + ')</i></div>');
+		newDiv.data('settings', serverInheritDefault(new Router(name, prompt('give me a subnet!'))));
+	}
+	else if (device == 'metal') { 
+		newDiv.html('<div class="card-header">' + name + '<i>(' + networkDevices.metal + ')</i></div><div class="metalLayout"></div>');
+		newDiv.data('settings', serverInheritDefault(new Metal(name, prompt('give me a subnet!'))));
+	}
+	else if (device == 'service') { 
+		newDiv.html('<div class="card-header">' + name + '<i>(' + networkDevices.service + ')</i></div>');
+		newDiv.data('settings', serverInheritDefault(new Service(name, prompt('give me a subnet!'))));
+	}
+	else if (device == 'internalonly') { 
+		newDiv.html('<div class="card-header">' + name + '<i>(' + networkDevices.internal + ')</i></div>');
+		newDiv.data('settings', new InternalOnlyDevice(name));
+		parent = $('#deviceLayout');
+	}
+	else if (device == 'externalonly') { 
+		newDiv.html('<div class="card-header">' + name + '<i>(' + networkDevices.external + ')</i></div>');
+		newDiv.data('settings', new ExternalOnlyDevice(name));
+		parent = $('#deviceLayout');
+	}
+	else if (device == 'user') { 
+		newDiv.html('<div class="card-header">' + name + '<i>(' + networkDevices.user + ')</i></div>');
+		newDiv.data('settings', new UserDevice(name));
+		parent = $('#userLayout');
+	}
+
+	//Make the new device selectable
+	newDiv.on('click', function() {
+		updateDetailsPane($(this));
+		//avoid the triggering of parent element
+		return false;
+    });
+
+	//If the device is a server  allow creation of service and router on it
+	if(newDiv.hasClass('metal')){
+		createServer(newDiv);
+	}
+
+	parent.append(newDiv);
 	updateDetailsPane(newDiv);
+}
+
+function createServer(server){
+	//Add the option to add VM or router to a server
+	$.each(serverDevices, function(key, val) {
+		$('<div class="btn btn-info server-device p-1 m-1"><div>Add ' + val + '</div>')
+		.appendTo(server.children('.metalLayout'))
+		.addClass(key)
+		.addClass('model')
+		.click(function(event){
+			createDevice(key, server);
+		});
+	});
+
+	//Make the servers droppable (to receive router or service from another server)
+	server.droppable( {
+        over: function(event, ui) {
+            var $this = $(this);
+        },
+		drop: function(event, ui) {
+			$(this).append(ui.draggable);
+			
+			//when dropped, replace it properly
+			ui.draggable.css({"top": "0", "left": "0"});
+
+			//if coming form the network
+			if($(ui.draggable).hasClass('bg-dark')){
+				ui.draggable.addClass('bg-secondary m-1 server-device').removeClass('mb-1 p-1 bg-dark shadow added card model device');
+				ui.draggable.css("position", "relative");
+			}
+		}
+	});
 }
 
 function updateDetailsPane(device) {
@@ -204,7 +254,7 @@ function updateDetailsPane(device) {
 		var deleteDeviceButton = $('<button/>', {
 	        text: "Delete this device",
 	        id: 'delete_button',
-	        class: 'ui-button ui-widget ui-corner-all',
+	        class: 'btn btn-danger',
 			click: function(){
 				deleteDevice(device);
 			}
@@ -218,6 +268,21 @@ function deleteDevice(device){
 	$('#infoPane').empty();
 }
 
+function importJson(elemId) {
+	//For testing purpose import local file
+	$.getJSON("pi.json", function(json) {
+	    parseJson(json);
+	});
+	return true;
+
+	console.log('ok');
+	var elem = document.getElementById(elemId);
+	if(elem && document.createEvent) {
+	  var evt = document.createEvent("MouseEvents");
+	  evt.initEvent("click", true, false);
+	  elem.dispatchEvent(evt);
+	}
+}
 
 function serverInheritDefault(server) {
 	var skip = [ 'hostname',

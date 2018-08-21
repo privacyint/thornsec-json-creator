@@ -79,8 +79,17 @@ h1, h2, h3, h4 {
 }
 
 .added{
-  width: 120px;
-  height: 80px;
+  width: 140px;
+}
+
+.model.server-device{
+  width: 95px;  
+  white-space: normal;
+  float: left;
+}
+
+.metalLayout{
+  display: inline-block;
 }
 
 #deviceToolbox div {
@@ -94,9 +103,9 @@ h1, h2, h3, h4 {
 }
 
 #networkLayout .metal.added {
- height: 300px;
- width:200px;
- overflow: auto;
+ min-height: 300px;
+ width:210px;
+ /*overflow: auto;*/
 }
 
 #delete_button{
@@ -143,6 +152,11 @@ fieldset .help {
 */
 .wizard > .content > .body input {
   display: inline-block;
+}
+
+/* FILE */
+#configFile{
+  display:none;
 }
 
 /* FONTS */

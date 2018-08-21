@@ -24,6 +24,7 @@
 
 	<script src="objects.js"></script>
 	<script src="logic.js"></script>
+	<script src="import.js"></script>
 </head>
 <body>
 	<div class="container">
@@ -31,8 +32,9 @@
 			<div class="row flex-nowrap justify-content-between align-items-center">
 				<div class="col-12 text-center">
 					<h1>Thornsec JSON Creator</h1>
-					<button class="btn btn-primary">Import</button>
-					<button class="btn btn-primary">Save</button>
+					<button class="btn btn-primary" id="importButton">Import</button>
+					<input type="file" id="configFile">
+					<button class="btn btn-primary" id="exportButton">Save</button>
 				</div>
 			</div>
 		</header>
@@ -373,8 +375,8 @@
 											<h4 class="text-info">Network layout</h4>
 										</div>
 										<div class="col-md-6">
-											<div class="btn btn-secondary metal device model">Add Server</div>
-											<div class="btn btn-secondary router device model">Add Router</div>	
+											<div class="btn btn-info metal device model" value="metal">Add Server</div>
+											<div class="btn btn-info router device model" value="router">Add Router</div>	
 										</div>
 									</div>
 									<div id="networkLayout"></div>
@@ -385,7 +387,7 @@
 											<h4 class="text-info">Users</h4>
 										</div>
 										<div class="col-md-6">
-											<div class="btn btn-secondary user device model">Add User</div>
+											<div class="btn btn-info user device model" value="user">Add User</div>
 										</div>
 									</div>
 									<div id="userLayout"></div>
@@ -396,8 +398,8 @@
 											<h4 class="text-info">Devices</h4>
 										</div>
 										<div class="col-md-6">
-											<div class="btn btn-secondary internalonly device model">Add external device</div>
-											<div class="btn btn-secondary externalonly device model">Add internal device</div>
+											<div class="btn btn-info internalonly device model" value="internalonly">Add external device</div>
+											<div class="btn btn-info externalonly device model" value="externalonly">Add internal device</div>
 										</div>
 									</div>
 									<div id="deviceLayout"></div>
@@ -410,6 +412,9 @@
 					</div>
 				</div>
 			</div>
+
+			<!-- DEFAULT DEVICE -->
+			<div id="defaultDevice" class="card text-white added bg-dark shadow " style="display: none"></div>
 		</body>
 		</html>
 
