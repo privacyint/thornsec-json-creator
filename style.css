@@ -59,10 +59,12 @@ h1, h2, h3, h4 {
 
 #userLayout{
   min-height: 150px;
+  overflow: hidden;
 }
 
 #deviceLayout{
   min-height: 150px;
+  overflow: auto;
 }
 
 #infoPane {
@@ -90,6 +92,18 @@ h1, h2, h3, h4 {
 
 .metalLayout{
   display: inline-block;
+}
+
+.added.user{
+  height: 100px;
+}
+
+.added.externalonly{
+  width:200px;
+}
+
+.added.internalonly{
+  width:200px;
 }
 
 #deviceToolbox div {

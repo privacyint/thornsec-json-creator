@@ -15,8 +15,9 @@ var networkData = new Network('');
 var defaultServerData = new Machine('', '');
 
 $( function() {
-	$("#importButton").click(function(){
-	    parseJson();
+	//Import function
+    $("#importButton").click(function(){
+	    importJson();
 	});
 
 	//Make add buttons clickable
@@ -107,17 +108,21 @@ $( function() {
 
 });
 
-function createDevice(device, parent){
-	console.log(device);
+function createDevice(device, parent, name, parameters){
+	//If there is no params we ask basics
+	if(!parameters){
+		var name = prompt('give me a name!');
+		//Cancel if no name entered
+		if(name == null || name == ""){ return false;}
 
-	var name = prompt('give me a name!');
-	//Cancel if no name entered
-	if(name == null || name == ""){ return false;}
+		var subnet = prompt('give me a subnet!');
+	}
 
+	//Creating the div 
 	var newDiv = $("#defaultDevice").clone(false)
 		.data('clone', true)
 		.attr('id', name)
-		.addClass('device ' + device)
+		.addClass('added device ' + device)
 		.show();
 
 	//If there is a parent it means this is inside a metal and should and have a different look
@@ -140,37 +145,47 @@ function createDevice(device, parent){
 		});
 	}
 
+	//Else we put it on the network by default
 	if(!parent){
 		var parent = $('#networkLayout');
 	}
 
 	//Defining classes and properties for each device
 	if (device == 'router') { 
-		newDiv.html('<div class="card-header">' + name + '<i>(' + networkDevices.router + ')</i></div>');
-		newDiv.data('settings', serverInheritDefault(new Router(name, prompt('give me a subnet!'))));
+		newDiv.html('<div class="card-header">' + name + '<i> (' + networkDevices.router + ')</i></div>');
+		newDiv.data('settings', serverInheritDefault(new Router(name, subnet)));
 	}
 	else if (device == 'metal') { 
-		newDiv.html('<div class="card-header">' + name + '<i>(' + networkDevices.metal + ')</i></div><div class="metalLayout"></div>');
-		newDiv.data('settings', serverInheritDefault(new Metal(name, prompt('give me a subnet!'))));
+		newDiv.html('<div class="card-header">' + name + '<i> (' + networkDevices.metal + ')</i></div><div class="metalLayout"></div>');
+		newDiv.data('settings', serverInheritDefault(new Metal(name, subnet)));
 	}
 	else if (device == 'service') { 
-		newDiv.html('<div class="card-header">' + name + '<i>(' + networkDevices.service + ')</i></div>');
-		newDiv.data('settings', serverInheritDefault(new Service(name, prompt('give me a subnet!'))));
+		newDiv.html('<div class="card-header">' + name + '<i> (' + networkDevices.service + ')</i></div>');
+		newDiv.data('settings', serverInheritDefault(new Service(name, subnet)));
 	}
 	else if (device == 'internalonly') { 
-		newDiv.html('<div class="card-header">' + name + '<i>(' + networkDevices.internal + ')</i></div>');
+		newDiv.html('<div class="card-header">' + name + '<i> (' + networkDevices.internal + ')</i></div>');
 		newDiv.data('settings', new InternalOnlyDevice(name));
 		parent = $('#deviceLayout');
 	}
 	else if (device == 'externalonly') { 
-		newDiv.html('<div class="card-header">' + name + '<i>(' + networkDevices.external + ')</i></div>');
+		newDiv.html('<div class="card-header">' + name + '<i> (' + networkDevices.external + ')</i></div>');
 		newDiv.data('settings', new ExternalOnlyDevice(name));
 		parent = $('#deviceLayout');
 	}
 	else if (device == 'user') { 
-		newDiv.html('<div class="card-header">' + name + '<i>(' + networkDevices.user + ')</i></div>');
+		newDiv.html('<div class="card-body">' + name + '<i> (' + networkDevices.user + ')</i></div>');
 		newDiv.data('settings', new UserDevice(name));
 		parent = $('#userLayout');
+	}
+
+	//Update objects if there are parameters (import)
+	if(parameters){
+		$.each(parameters, function(key, value){
+			newDiv.data('settings')[key] = value;
+		})
+		// console.log(parameters);
+		// console.log(newDiv);
 	}
 
 	//Make the new device selectable
@@ -263,25 +278,42 @@ function updateDetailsPane(device) {
 	}
 }
 
-function deleteDevice(device){
-	device.remove();
+function deleteDevice(device)
+{	device.remove();
 	$('#infoPane').empty();
 }
 
 function importJson(elemId) {
+	var newNetworks = [];
+
+	//Avoid errors https://stackoverflow.com/questions/2618959/not-well-formed-warning-when-loading-client-side-json-in-firefox-via-jquery-aj/4234006
+	$.ajaxSetup({beforeSend: function(xhr){
+		if (xhr.overrideMimeType)
+		{
+			xhr.overrideMimeType("application/json");
+		}
+	}});
+
 	//For testing purpose import local file
 	$.getJSON("pi.json", function(json) {
-	    parseJson(json);
-	});
-	return true;
+	    newNetworks = processJson(json);
 
-	console.log('ok');
-	var elem = document.getElementById(elemId);
-	if(elem && document.createEvent) {
-	  var evt = document.createEvent("MouseEvents");
-	  evt.initEvent("click", true, false);
-	  elem.dispatchEvent(evt);
-	}
+	    //for now we just accept one network but there should be a possibility to exploit the multplie networks of a json file
+		networkData = newNetworks[0];
+
+		//Update the object and display
+		$('#networkLayout').data(
+	    	'settings', networkData
+	    )
+	    updateDetailsPane($('#networkLayout'));
+	});
+
+	// var elem = document.getElementById(elemId);
+	// if(elem && document.createEvent) {
+	//   var evt = document.createEvent("MouseEvents");
+	//   evt.initEvent("click", true, false);
+	//   elem.dispatchEvent(evt);
+	// }
 }
 
 function serverInheritDefault(server) {

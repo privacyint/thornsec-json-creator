@@ -88,6 +88,7 @@ function UserDevice(name) {
 	
 	this.fullname = null;
 	this.sshkey   = null;
+	this.macs = [];
 }
 
 inheritPrototype(Router, Machine);
