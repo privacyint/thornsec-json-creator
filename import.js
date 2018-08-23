@@ -13,6 +13,17 @@ function processJson(json){
 			if($.isPlainObject(device)){
 				switch (deviceKey){
 					case 'servers':
+						$.each(device, function(subDeviceKey, subDevice){
+							if(subDevice.types.length == 1){
+								if(subDevice.types[0] == "router" || subDevice.types[0] == "metal"){
+									createDevice(subDevice.types[0], '', subDeviceKey, subDevice);
+								}else{
+									createDevice('service', $('#' + subDevice.metal), subDeviceKey, subDevice);
+								}
+							}
+							//console.log(subDevice.types[0]);
+							//createDevice('metal', '', paramsKey, params);
+						})	
 						break;
 					case 'users':
 						$.each(device, function(paramsKey, params){

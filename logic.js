@@ -32,7 +32,7 @@ $( function() {
             var $this = $(this);
         },
 		drop: function(event, ui) {
-			ui.draggable.removeClass('bg-secondary m-1 server-device').addClass('device bg-dark shadow added card');
+			ui.draggable.removeClass('m-1 server-device').addClass('device shadow added card');
 			ui.draggable.css("position", "relative");
 
 			$(this).append(ui.draggable);
@@ -109,7 +109,13 @@ $( function() {
 });
 
 function createDevice(device, parent, name, parameters){
-	//If there is no params we ask basics
+	//Zou can't have more than one router
+	if(device == 'router' && $('#addRouterBtn').hasClass('disabled')){
+		alert('you cannot have more than one router');
+		return false;
+	}
+
+	//If there is no params we ask the basics
 	if(!parameters){
 		var name = prompt('give me a name!');
 		//Cancel if no name entered
@@ -152,8 +158,10 @@ function createDevice(device, parent, name, parameters){
 
 	//Defining classes and properties for each device
 	if (device == 'router') { 
+		newDiv.addClass('bg-warning').removeClass('bg-secondary bg-dark');
 		newDiv.html('<div class="card-header">' + name + '<i> (' + networkDevices.router + ')</i></div>');
 		newDiv.data('settings', serverInheritDefault(new Router(name, subnet)));
+		$('#addRouterBtn').addClass('disabled');
 	}
 	else if (device == 'metal') { 
 		newDiv.html('<div class="card-header">' + name + '<i> (' + networkDevices.metal + ')</i></div><div class="metalLayout"></div>');
@@ -228,8 +236,8 @@ function createServer(server){
 			ui.draggable.css({"top": "0", "left": "0"});
 
 			//if coming form the network
-			if($(ui.draggable).hasClass('bg-dark')){
-				ui.draggable.addClass('bg-secondary m-1 server-device').removeClass('mb-1 p-1 bg-dark shadow added card model device');
+			if($(ui.draggable).hasClass('bg-warning')){
+				ui.draggable.addClass('m-1 server-device').removeClass('mb-1 p-1 shadow added card model device');
 				ui.draggable.css("position", "relative");
 			}
 		}
@@ -279,9 +287,14 @@ function updateDetailsPane(device) {
 }
 
 function deleteDevice(device)
-{	device.remove();
+{	
+	device.remove();
 	$('#infoPane').empty();
+	if(device.hasClass('router')){
+		$('#addRouterBtn').removeClass('disabled');
+	}
 }
+
 
 function importJson(elemId) {
 	var newNetworks = [];
