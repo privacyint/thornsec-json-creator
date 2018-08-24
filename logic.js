@@ -15,9 +15,13 @@ var networkData = new Network('');
 var defaultServerData = new Machine('', '');
 
 $( function() {
-	//Import function
+	//Import button triggers file select which will parse the file
     $("#importButton").click(function(){
-	    importJson();
+	    $("#configFile").click();
+	});
+
+	$("#exportButton").click(function(){
+	    generateJson();
 	});
 
 	//Make add buttons clickable
@@ -73,14 +77,6 @@ $( function() {
 	    }
     });
 
-    $('[title]').tooltip({
-		position: {
-			my: 'left top',
-			at: 'right+5 top-5',
-			collision: 'none'
-		}
-	});
-
 	$('#networkDefaultsForm').on('input', function(e) {
 		var property = ((e.target.id).split('_')[1]);
 		networkData[property] = e.target.value;
@@ -96,6 +92,14 @@ $( function() {
 		var property = ((e.target.id).split('_')[1]);
 		defaultServerData[property] = e.target.value;
 	});
+
+	// $('[title]').tooltip({
+	// 	position: {
+	// 		my: 'left top',
+	// 		at: 'right+5 top-5',
+	// 		collision: 'none'
+	// 	}
+	// });
 
     //$( "<button>" )
     //  .text( "Show help" )
@@ -296,7 +300,7 @@ function deleteDevice(device)
 }
 
 
-function importJson(elemId) {
+function importJson(event) {
 	var newNetworks = [];
 
 	//Avoid errors https://stackoverflow.com/questions/2618959/not-well-formed-warning-when-loading-client-side-json-in-firefox-via-jquery-aj/4234006
@@ -307,9 +311,17 @@ function importJson(elemId) {
 		}
 	}});
 
-	//For testing purpose import local file
-	$.getJSON("pi.json", function(json) {
-	    newNetworks = processJson(json);
+	//prepare file reader and processing
+	fr = new FileReader();
+	//var configFile = $('#configFile');
+	var configFile = event.target.files[0];;
+
+	fr.onload = function(file){
+		//Should add a check to make sure it's a json file
+
+		json = $.parseJSON(file.target.result)
+   		//processing
+		newNetworks = processJson(json);
 
 	    //for now we just accept one network but there should be a possibility to exploit the multplie networks of a json file
 		networkData = newNetworks[0];
@@ -319,14 +331,14 @@ function importJson(elemId) {
 	    	'settings', networkData
 	    )
 	    updateDetailsPane($('#networkLayout'));
-	});
+	};
 
-	// var elem = document.getElementById(elemId);
-	// if(elem && document.createEvent) {
-	//   var evt = document.createEvent("MouseEvents");
-	//   evt.initEvent("click", true, false);
-	//   elem.dispatchEvent(evt);
-	// }
+	fr.readAsText(configFile);
+
+	//For testing purpose import local file
+	// $.getJSON("pi.json", function(json) {
+	   
+	// });
 }
 
 function serverInheritDefault(server) {

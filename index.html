@@ -25,6 +25,7 @@
 	<script src="objects.js"></script>
 	<script src="logic.js"></script>
 	<script src="import.js"></script>
+	<script src="export.js"></script>
 </head>
 <body>
 	<div class="container">
@@ -33,7 +34,7 @@
 				<div class="col-12 text-center">
 					<h1>Thornsec JSON Creator</h1>
 					<button class="btn btn-primary" id="importButton">Import</button>
-					<input type="file" id="configFile">
+					<input type="file" id="configFile" onchange="importJson(event)">
 					<button class="btn btn-primary" id="exportButton">Save</button>
 				</div>
 			</div>
@@ -407,6 +408,7 @@
 							</div>
 						</div>
 						<div class="p-3 col-md-4 border-left">
+							<div id="infoPaneAnchor"></div>
 							<div id="infoPane"></div>
 						</div>
 					</div>

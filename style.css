@@ -69,6 +69,12 @@ h1, h2, h3, h4 {
 
 #infoPane {
   text-align: center;
+  position: sticky;
+  position: -webkit-sticky;
+  position: -moz-sticky;
+  position: -ms-sticky;
+  position: -o-sticky;
+  top: 15px;
 }
 
 .device{
@@ -166,6 +172,9 @@ fieldset .help {
 */
 .wizard > .content > .body input {
   display: inline-block;
+}
+
+#importButton{
 }
 
 /* FILE */
