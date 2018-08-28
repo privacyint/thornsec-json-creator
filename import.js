@@ -20,6 +20,18 @@ function processJson(json){
 								}else{
 									createDevice('service', $('#' + subDevice.metal), subDeviceKey, subDevice);
 								}
+							}else{
+								if(($.inArray("router", subDevice.types) !== -1) && ($.inArray("metal", subDevice.types) !== -1)){
+									var router = {};
+									$.each(subDevice, function(key, value){
+										if(key == 'extconfig' || key == 'extconnection' || key == 'extiface'){
+											router[key] = value.slice(0);
+											delete subDevice[key];
+										}										
+									})									
+									createDevice('metal', '', subDeviceKey, subDevice);
+									createDevice('router', $('#' + subDeviceKey), 'router', router);
+								}
 							}
 							//console.log(subDevice.types[0]);
 							//createDevice('metal', '', paramsKey, params);
