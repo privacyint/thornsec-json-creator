@@ -13,6 +13,7 @@
 	<link rel="stylesheet" type="text/css" href="external/bootstrap-4.1.3-dist/css/bootstrap-grid.min.css">
 	<link rel="stylesheet" type="text/css" href="external/bootstrap-4.1.3-dist/css/bootstrap-reboot.min.css">
 	<link rel="stylesheet" type="text/css" href="external/bootstrap-4.1.3-dist/css/bootstrap.min.css">
+	<link rel="stylesheet" type="text/css" href="external/bootstrap-tagsinput/bootstrap-tagsinput.css">
 
 	<script src="external/jquery/jquery.min.js"></script>
 	<script src="jquery-ui.js"></script>
@@ -20,12 +21,14 @@
 	<script src="external/jquery.validate/jquery.validate.min.js"></script>
 
 	<script src="external/bootstrap-4.1.3-dist/js/bootstrap.bundle.min.js"></script>
-	<script src="external/bootstrap-4.1.3-dist/js/bootstrap.min.js"></script>
+	<script src="external/bootstrap-tagsinput/bootstrap-tagsinput.min.js"></script>
 
 	<script src="objects.js"></script>
 	<script src="logic.js"></script>
 	<script src="import.js"></script>
 	<script src="export.js"></script>
+	<script src="network.js"></script>
+	<script src="device.js"></script>
 </head>
 <body>
 	<div class="container">
@@ -33,9 +36,17 @@
 			<div class="row flex-nowrap justify-content-between align-items-center">
 				<div class="col-12 text-center">
 					<h1>Thornsec JSON Creator</h1>
-					<button class="btn btn-primary" id="importButton">Import</button>
-					<input type="file" id="configFile" onchange="importJson(event)">
-					<button class="btn btn-primary" id="exportButton">Save</button>
+					<div class="row">
+						<div class="col-6 text-left">
+							<button class="btn btn-primary" id="importButton">Import</button>
+							<input type="file" id="configFile" onchange="importJson(event)">
+							<button class="btn btn-primary" id="exportButton">Save</button>
+						</div>
+						<div class="col-6 text-right">
+							<button class="btn btn-success" id="deleteAllButton" onclick="createNetwork()">Add Network</button>
+							<button class="btn btn-danger" id="deleteAllButton" onclick="deleteAllNetworks()">Delete All Networks</button>
+						</div>						
+					</div>
 				</div>
 			</div>
 		</header>
@@ -366,50 +377,59 @@
 				</div>
 
 				<!-- MAIN PAGE -->
-				<div class="col-md-12 mb-4 text-muted bg-light rounded border">
-					<div class="row">
-						<div class="col-md-8" id="network-container">
-							<div class="column">
-								<div class="p-3 row-md-4 border-bottom">
-									<div class="row">
-										<div class="col-md-6">
-											<h4 class="text-info">Network layout</h4>
+				<ul class="nav nav-tabs" id="networkTabs" role="tablist">
+					<li class="nav-item" id="networkTabAdd">
+						<a class="nav-link" id="profile-tab" data-toggle="tab" href="#profile" role="tab" aria-controls="profile" aria-selected="false" onclick="createNetwork()">+</a>
+					</li>
+				</ul>
+
+				<div class="tab-content" id="networksContent">
+					<div class="network-layout col-md-12 mb-4 text-muted bg-light rounded border tab-pane fade" role="tabpanel" aria-labelledby="networkTab_0" id="network_0" style="display:none">
+						<div class="col-md-12 mt-2 text-right"><button class="btn btn-danger" id="deleteAllButton" onclick="deleteNetwork($(this).parents().eq(1).attr('id').slice(-1))">Delete this network</button></div>
+						<div class="row">
+							<div class="col-md-8" id="network-container">
+								<div class="column">
+									<div class="p-3 row-md-4 border-bottom">
+										<div class="row">
+											<div class="col-md-6">
+												<h4 class="text-info">Network layout</h4>
+											</div>
+											<div class="col-md-6">
+												<div class="btn btn-info metal device model" value="metal" onclick="createDevice('metal', $(this).parents().eq(6))">Add Server</div>
+												<div id="addRouterBtn_0" class="btn btn-info router device model" value="router" onclick="createDevice('router', $(this).parents().eq(6))">Add Router</div>	
+											</div>
 										</div>
-										<div class="col-md-6">
-											<div class="btn btn-info metal device model" value="metal">Add Server</div>
-											<div id="addRouterBtn" class="btn btn-info router device model" value="router">Add Router</div>	
-										</div>
+										<div id="networkLayout_0" class="networkLayout"></div>
 									</div>
-									<div id="networkLayout"></div>
-								</div>
-								<div class="p-3 row-md-4 border-bottom">
-									<div class="row">
-										<div class="col-md-6">
-											<h4 class="text-info">Users</h4>
+									<div class="p-3 row-md-4 border-bottom">
+										<div class="row">
+											<div class="col-md-6">
+												<h4 class="text-info">Users</h4>
+											</div>
+											<div class="col-md-6">
+												<div class="btn btn-info user device model" value="user" onclick="createDevice('user', $(this).parents().eq(6))">Add User</div>
+											</div>
 										</div>
-										<div class="col-md-6">
-											<div class="btn btn-info user device model" value="user">Add User</div>
-										</div>
+										<div id="userLayout_0" class="userLayout"></div>
 									</div>
-									<div id="userLayout"></div>
-								</div>
-								<div class="p-3 row-md-4">
-									<div class="row">
-										<div class="col-md-6">
-											<h4 class="text-info">Devices</h4>
+									<div class="p-3 row-md-4">
+										<div class="row">
+											<div class="col-md-6">
+												<h4 class="text-info">Devices</h4>
+											</div>
+											<div class="col-md-6">
+												<div class="btn btn-info internalonly device model" value="internalonly" onclick="createDevice('internalonly', $(this).parents().eq(6))">Add external device</div>
+												<div class="btn btn-info externalonly device model" value="externalonly" onclick="createDevice('externalonly', $(this).parents().eq(6))">Add internal device</div>
+											</div>
 										</div>
-										<div class="col-md-6">
-											<div class="btn btn-info internalonly device model" value="internalonly">Add external device</div>
-											<div class="btn btn-info externalonly device model" value="externalonly">Add internal device</div>
-										</div>
+										<div id="deviceLayout_0" class="deviceLayout"></div>
 									</div>
-									<div id="deviceLayout"></div>
 								</div>
 							</div>
-						</div>
-						<div class="p-3 col-md-4 border-left">
-							<div id="infoPaneAnchor"></div>
-							<div id="infoPane"></div>
+							<div class="p-3 col-md-4 border-left">
+								<div id="infoPaneAnchor"></div>
+								<div id="infoPane_0" class="infoPane"></div>
+							</div>
 						</div>
 					</div>
 				</div>

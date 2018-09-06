@@ -18,8 +18,8 @@ function Network(name) {
 	this.dns              = '8.8.8.8'; //Optional
 }
 
-function Machine(hostname, subnet) {
-	this.hostname        = hostname;
+function Machine(name, subnet) {
+	this.name        	 = name;
 	this.subnet          = subnet;
 	this.admins          = {};
 	this.sshsource       = {};
@@ -41,22 +41,22 @@ function Machine(hostname, subnet) {
 	this.domain          = null;	
 }
 
-function Router(hostname, subnet) {
-	Machine.call(this, hostname, subnet);
+function Router(name, subnet) {
+	Machine.call(this, name, subnet);
 
 	this.extiface      = null;
 	this.extconnection = null;
 }
 
-function Metal(hostname, subnet) {
-	Machine.call(this, hostname, subnet);
+function Metal(name, subnet) {
+	Machine.call(this, name, subnet);
 
 	this.extiface        = null; //Optional, inherited
 	this.vmbase          = null; //Optional, inherited
 }
 
-function Service(hostname, subnet) {
-	Machine.call(this, hostname, subnet);
+function Service(name, subnet) {
+	Machine.call(this, name, subnet);
 
 	this.profiles        = {};   //Mandatory
 	this.metal           = null; //Mandatory

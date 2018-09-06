@@ -5,8 +5,8 @@ function processJson(json){
 	//iterate the networks
 	$.each(json, function(key, network){
 		//create the network
-		var newNetwork = new Network();
-		newNetwork.name = key;
+		newNetwork = createNetwork(key);
+		newNetwork.data('settings')['name'] = key;
 
 		//Circle throught devices on the network
 		$.each(network, function(deviceKey, device){
@@ -16,7 +16,7 @@ function processJson(json){
 						$.each(device, function(subDeviceKey, subDevice){
 							if(subDevice.types.length == 1){
 								if(subDevice.types[0] == "router" || subDevice.types[0] == "metal"){
-									createDevice(subDevice.types[0], '', subDeviceKey, subDevice);
+									createDevice(subDevice.types[0], newNetwork, subDeviceKey, subDevice);
 								}else{
 									createDevice('service', $('#' + subDevice.metal), subDeviceKey, subDevice);
 								}
@@ -29,7 +29,7 @@ function processJson(json){
 											delete subDevice[key];
 										}										
 									})									
-									createDevice('metal', '', subDeviceKey, subDevice);
+									createDevice('metal', newNetwork, subDeviceKey, subDevice);
 									createDevice('router', $('#' + subDeviceKey), 'router', router);
 								}
 							}
@@ -39,28 +39,28 @@ function processJson(json){
 						break;
 					case 'users':
 						$.each(device, function(paramsKey, params){
-							createDevice('user', '', paramsKey, params);
+							createDevice('user', $('#userLayout_' + lastNetworkId), paramsKey, params);
 						})	
 						break;			
 					case 'internaldevices':
 						$.each(device, function(paramsKey, params){
-							createDevice('internalonly', '', paramsKey, params);
+							createDevice('internalonly', $('#deviceLayout_' + lastNetworkId), paramsKey, params);
 						})	
 						break;
 					case 'externaldevices':
 						$.each(device, function(paramsKey, params){
-							createDevice('externalonly', '', paramsKey, params);
+							createDevice('externalonly', $('#deviceLayout_' + lastNetworkId), paramsKey, params);
 						})	
 						break;
 				}
 			}else{
 				//Network parameters
-				newNetwork[deviceKey] = device;
+				newNetwork.data('settings')[deviceKey] = device;
 			}
 		});
-
 		newNetworks.push(newNetwork);
-	});
 
+	});
+	
 	return newNetworks;
 }
