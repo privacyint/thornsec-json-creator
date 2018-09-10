@@ -6,7 +6,16 @@ function processJson(json){
 	$.each(json, function(key, network){
 		//create the network
 		newNetwork = createNetwork(key);
-		newNetwork.data('settings')['name'] = key;
+
+		//give the network a name
+		$('#networkLayout_' + lastNetworkId).data('settings')['name'] = key;
+
+		//init network properties before devices 
+		$.each(network, function(deviceKey, device){
+			if(!$.isPlainObject(device)){
+				$('#networkLayout_' + lastNetworkId).data('settings')[deviceKey] = device;
+			}
+		});
 
 		//Circle throught devices on the network
 		$.each(network, function(deviceKey, device){
@@ -21,6 +30,7 @@ function processJson(json){
 									createDevice('service', $('#' + subDevice.metal), subDeviceKey, subDevice);
 								}
 							}else{
+								//if router in on server
 								if(($.inArray("router", subDevice.types) !== -1) && ($.inArray("metal", subDevice.types) !== -1)){
 									var router = {};
 									$.each(subDevice, function(key, value){
@@ -53,14 +63,11 @@ function processJson(json){
 						})	
 						break;
 				}
-			}else{
-				//Network parameters
-				newNetwork.data('settings')[deviceKey] = device;
 			}
 		});
-		newNetworks.push(newNetwork);
-
 	});
-	
-	return newNetworks;
+
+	//select the latest tab
+	//make tabs selectable
+	$('#networkTab_' + lastNetworkId).tab('show');
 }

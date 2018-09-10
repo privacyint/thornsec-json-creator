@@ -91,6 +91,9 @@ function UserDevice(name) {
 	this.macs = [];
 }
 
+//List of mandatory fields to give visual info + force fields validation
+var mandatoryFields = ['name', 'ip', 'gpg', 'adminemail', 'domain', 'profiles', 'metal', 'macs','extiface','extconnetion'];
+
 inheritPrototype(Router, Machine);
 inheritPrototype(Metal, Machine);
 inheritPrototype(Service, Machine);

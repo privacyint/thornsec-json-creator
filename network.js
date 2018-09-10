@@ -8,8 +8,9 @@ function createNetwork(networkName){
 	}
 
 	var newNetwork = $("#network_0").clone(false)
-		.attr('id', 'network_'+lastNetworkId)
+		.attr('id', 'network_' + lastNetworkId)
 		.attr('value', lastNetworkId)
+		.attr('aria-labelledby', 'networkTab_' + lastNetworkId)
 		.show();
 
 	//Changing the unique IDs of the layout. Could be automated in one line probably
@@ -23,16 +24,15 @@ function createNetwork(networkName){
 
 	$('#networksContent').append(newNetwork);
 	$('#networkTabAdd').before(newNetworkTab);
-	$('#networkTab-' + lastNetworkId).tab('show');
 
-	initNetwork(newNetwork);
+	initNetwork($('#networkLayout_' + lastNetworkId));
 
 	return newNetwork;
 }
 
 function initNetwork(network){
 	//Network layout is droppable (only for routers coming from servers)
-	$('#networkLayout_' + lastNetworkId).droppable( {
+	network.droppable( {
 		accept: ".router",
         over: function(event, ui) {
             var $this = $(this);

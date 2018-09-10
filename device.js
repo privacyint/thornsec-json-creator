@@ -19,7 +19,7 @@ function createDevice(device, parent, name, parameters){
 		//Cancel if no name entered
 		if(name == null || name == ""){ return false;}
 
-		if(device == ('router') || device == ('metal')){
+		if(device == ('router') || device == ('metal') || device == ('service')){
 			var subnet = prompt('give me a subnet!');
 		}
 	}
@@ -55,17 +55,19 @@ function createDevice(device, parent, name, parameters){
 	if (device == 'router') { 
 		newDiv.addClass('bg-warning').removeClass('bg-secondary bg-dark');
 		newDiv.html('<div class="card-header">' + name + '<i> (' + networkDevices.router + ')</i></div>');
-		newDiv.data('settings', serverInheritDefault(new Router(name, subnet)));
+		newDiv.data('settings', serverInheritDefault(new Router(name, subnet), parent));
+		newDiv.data('settings')['types'] = ['router'];
 		$('#addRouterBtn_' + networkId).addClass('disabled');
 	}
 	else if (device == 'metal') { 
 		newDiv.html('<div class="card-header">' + name + '<i> (' + networkDevices.metal + ')</i></div><div class="metalLayout"></div>');
-		newDiv.data('settings', serverInheritDefault(new Metal(name, subnet)));
-		parent = $('#networkLayout_' + networkId);
+		newDiv.data('settings', serverInheritDefault(new Metal(name, subnet), parent));
+		newDiv.data('settings')['types'] = ['metal'];
 	}
 	else if (device == 'service') { 
 		newDiv.html('<div class="card-header">' + name + '<i> (' + networkDevices.service + ')</i></div>');
-		newDiv.data('settings', serverInheritDefault(new Service(name, subnet)));
+		newDiv.data('settings', serverInheritDefault(new Service(name, subnet), parent));
+		newDiv.data('settings')['types'] = ['service'];
 	}
 	else if (device == 'internalonly') { 
 		newDiv.html('<div class="card-header">' + name + '<i> (' + networkDevices.internal + ')</i></div>');
@@ -88,8 +90,6 @@ function createDevice(device, parent, name, parameters){
 		$.each(parameters, function(key, value){
 			newDiv.data('settings')[key] = value;
 		})
-		// console.log(parameters);
-		// console.log(newDiv);
 	}
 
 	//Make the new device selectable
@@ -151,17 +151,23 @@ function deleteDevice(device, networkId)
 	}
 }
 
-function serverInheritDefault(server) {
+function serverInheritDefault(server, network) {
+	//IS THIS ACTUALLY USEFUL?
+
 	var skip = [ 'name',
 				 'subnet'
 			   ];
 
-	$.each($(server).data('settings'), function (setting, val) {
-		if (val === Object(val)) {
-		}
-		else {
-			if (val != $(defaultServerData).data('settings')[setting]) {				
-				$(server).data('settings')[setting] = $(defaultServerData).data('settings')[setting];
+	$.each(server, function (setting, val) {
+		//only copy server properties (and not network properties)
+		if(defaultServerData.hasOwnProperty(setting)){
+			if (val === Object(val)) {
+			}
+			else {
+				//don't copy name and empty properties
+				if(network.data('settings')[setting] && network.data('settings')[setting]!= null && setting != 'name'){
+					//server[setting] = network.data('settings')[setting];
+				}
 			}
 		}		
 	});

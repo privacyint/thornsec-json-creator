@@ -75,13 +75,13 @@
 											<div class="card">
 												<div class="card-header" id="headingOne">
 													<h5 class="mb-0">
-														<button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+														<button class="btn btn-link" type="button" data-toggle="collapse" data-target="#networkCollapseOne" aria-expanded="true" aria-controls="networkCollapseOne">
 															Network Layout
 														</button>
 													</h5>
 												</div>
 
-												<div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-target="#gettingStartedAccordion">
+												<div id="networkCollapseOne" class="collapse show" aria-labelledby="headingOne" data-target="#gettingStartedAccordion">
 													<div class="card-body">
 														<div>
 															<label for="step1_type">Blah blah blah internal or external</label>
@@ -111,13 +111,13 @@
 											<div class="card">
 												<div class="card-header" id="headingOne">
 													<h5 class="mb-0">
-														<button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+														<button class="btn btn-link" type="button" data-toggle="collapse" data-target="#Network2collapseOne" aria-expanded="true" aria-controls="Network2collapseOne">
 															Mandatory Settings
 														</button>
 													</h5>
 												</div>
 
-												<div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-target="#NetworkSettingsAccordion">
+												<div id="Network2collapseOne" class="collapse show" aria-labelledby="headingOne" data-target="#NetworkSettingsAccordion">
 													<div class="card-body">
 														<div>
 															<label for="network_name">Network Name</label>
@@ -133,7 +133,7 @@
 														</div>
 														<div>
 															<label for="network_gpg">GPG Key ID</label>
-															<input type="email" id="network_gpg" name="network_gpg" title="This is the ID of the GPG key to use when storing/accessing passwords for the network" placeholder="user@myorganisation.com">
+															<input type="email" id="network_gpg" name="network_gpg" title="This is the ID of the GPG key to use when storing/accessing passwords for the network" placeholder="user@myorganisation.com" class="required">
 														</div>
 														<div>
 															<label for="network_adminemail">Admin Email Address</label>
@@ -145,12 +145,12 @@
 											<div class="card">
 												<div class="card-header" id="headingTwo">
 													<h5 class="mb-0">
-														<button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+														<button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#Network2collapseTwo" aria-expanded="false" aria-controls="Network2collapseTwo">
 															Optional Settings (with defaults)
 														</button>
 													</h5>
 												</div>
-												<div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-target="#NetworkSettingsAccordion">
+												<div id="Network2collapseTwo" class="collapse" aria-labelledby="headingTwo" data-target="#NetworkSettingsAccordion">
 													<div class="card-body">
 														<div>
 															<label for="network_class">LAN IP Address Range</label>
@@ -182,12 +182,12 @@
 											<div class="card">
 												<div class="card-header" id="headingThree">
 													<h5 class="mb-0">
-														<button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+														<button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#network2collapseThree" aria-expanded="false" aria-controls="network2collapseThree">
 															"Advanced" Settings (Experimental)
 														</button>
 													</h5>
 												</div>
-												<div id="collapseThree" class="collapse" aria-labelledby="headingThree" data-target="#NetworkSettingsAccordion">
+												<div id="network2collapseThree" class="collapse" aria-labelledby="headingThree" data-target="#NetworkSettingsAccordion">
 													<div class="card-body">
 														<div>
 															<label for="network_vpnonly">Internal services VPN only (Disabled)</label>
@@ -214,13 +214,13 @@
 											<div class="card">
 												<div class="card-header" id="headingOne">
 													<h5 class="mb-0">
-														<button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+														<button class="btn btn-link" type="button" data-toggle="collapse" data-target="#servercollapseOne" aria-expanded="true" aria-controls="servercollapseOne">
 															Default SSH Settings
 														</button>								    			
 													</h5>
 												</div>
 
-												<div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-target="#ServerSettingsAccordion">
+												<div id="servercollapseOne" class="collapse show" aria-labelledby="headingOne" data-target="#ServerSettingsAccordion">
 													<div class="card-body">
 														<div>
 															<div>
@@ -253,13 +253,13 @@
 											<div class="card">
 												<div class="card-header" id="headingTwo">
 													<h5 class="mb-0">
-														<button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+														<button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#servercollapseTwo" aria-expanded="false" aria-controls="servercollapseTwo">
 															Updates
 														</button>
 													</h5>
 
 												</div>
-												<div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-target="#ServerSettingsAccordion">
+												<div id="servercollapseTwo" class="collapse" aria-labelledby="headingTwo" data-target="#ServerSettingsAccordion">
 													<div class="card-body">
 														<div>
 															<div>
@@ -273,12 +273,12 @@
 											<div class="card">
 												<div class="card-header" id="headingThree">
 													<h5 class="mb-0">
-														<button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+														<button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#servercollapseThree" aria-expanded="false" aria-controls="servercollapseThree">
 															VM Defaults
 														</button>
 													</h5>
 												</div>
-												<div id="collapseThree" class="collapse" aria-labelledby="headingThree" data-target="#ServerSettingsAccordion">
+												<div id="servercollapseThree" class="collapse" aria-labelledby="headingThree" data-target="#ServerSettingsAccordion">
 													<div class="card-body">
 														<div>
 															<div>

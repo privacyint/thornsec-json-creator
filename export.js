@@ -4,8 +4,8 @@ function generateJson(){
 
 	for(i=1;i<=lastNetworkId;i++){
 		//Get the network properties
-		console.log($('#network_' + i));
-		var tmpNetwork = $('#network_' + i).data('settings');
+		console.log($('#networkLayout_' + i));
+		var tmpNetwork = $('#networkLayout_' + i).data('settings');
 		var networkName = tmpNetwork.name.slice(0);
 		delete tmpNetwork.name;
 		
@@ -58,11 +58,21 @@ function generateJson(){
 				$(device).children().each(function(vmKey, VM){
 					//ignore the title and buttons
 					if($(VM).hasClass('server-device')){
+
 						var tmpVM = $(VM).data('settings');
 						var VMName = tmpVM.name.slice(0);
-						delete tmpVM.name;
 
-						servers[VMName] = copyParams(tmpVM);
+						delete tmpVM.name;
+						//If the router is on the server, we combine them
+						if($(VM).hasClass('router')){
+							servers[deviceName] = copyParams(tmpVM);
+							servers[deviceName]['types'] = ['router','metal']
+						}else{
+							//regular VMs
+							servers[VMName] = copyParams(tmpVM);
+							//put the server name as the metal param of the VM
+							servers[VMName]['metal']= deviceName;
+						}
 					}
 				})
 

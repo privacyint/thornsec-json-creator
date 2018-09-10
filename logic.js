@@ -12,6 +12,8 @@ var serverDevices = { 'router'  :'Router',
 
 var networkData = new Network('');
 
+var wizardNetworkData = new Network('');
+
 var defaultServerData = new Machine('', '');
 
 var lastNetworkId = 0;
@@ -44,12 +46,23 @@ $( function() {
 	    },
 	    onFinished: function (event, currentIndex){
 	        wizardModal.modal('hide');
+	        //Create new network when ckicking finish
+	        var newNetwork = createNetwork($('#network_name').val());
+
+	        $.extend(defaultServerData, wizardNetworkData);
+	        console.log(defaultServerData);
+
+	        //copy datas from input to the freshly created network
+	        $('#networkLayout_' + lastNetworkId).data('settings', defaultServerData);
+
+	        //clean the default
+	        defaultServerData = new Machine('', '');
 	    }
     });
 
 	$('#networkDefaultsForm').on('input', function(e) {
 		var property = ((e.target.id).split('_')[1]);
-		networkData[property] = e.target.value;
+		wizardNetworkData[property] = e.target.value;
 	});
 
 	//populating the defaultServerData with pre-entered info
@@ -88,10 +101,16 @@ function updateDetailsPane(device, networkId) {
 	$.each($(device).data('settings'), function (setting, val) {
 		var settingTextBox = $(document.createElement('div'));
 
+		//check if the param is required
+		var required = '';
+		if($.inArray(setting, mandatoryFields) !== -1){
+			console.log('mandatory!');
+			required = 'required';
+		}
 
 		//Check if the setting is an object or just a string
 		if (val === Object(val)) {
-			var input = '<select multiple name="textbox_' + setting + '" id="textbox_' + device.attr('id') + '_' + setting + '" data-role="tagsinput"/>';
+			var input = '<select multiple name="textbox_' + setting + '" id="textbox_' + device.attr('id') + '_' + setting + '" data-role="tagsinput" class="' + required + '"/>';
 			settingTextBox.after().html('<label>' + setting + ': </label>' + input);
 
 			settingTextBox.appendTo('#infoPane_' + networkId);
@@ -112,7 +131,7 @@ function updateDetailsPane(device, networkId) {
 			})
 		}
 		else {
-			settingTextBox.after().html('<label>' + setting + ': </label><input class="settingInput" type="text" name="textbox_' + setting + '" id="textbox_' + setting + '" value="' + val + '" >');
+			settingTextBox.after().html('<label>' + setting + ': </label><input class="settingInput ' + required + '" type="text" name="textbox_' + setting + '" id="textbox_' + setting + '" value="' + val + '" >');
 
 			//update device's setting when modified
 			settingTextBox.on('input', 'input', function(e) {
@@ -162,7 +181,7 @@ function importJson(event) {
 
 		json = $.parseJSON(file.target.result)
    		//processing
-		newNetworks = processJson(json);
+		processJson(json);
 	};
 
 	fr.readAsText(configFile);
