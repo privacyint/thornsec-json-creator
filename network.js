@@ -1,17 +1,12 @@
 function createNetwork(networkName){
 	lastNetworkId++;
-	if(!networkName){
-		networkName = prompt('Network name');
-		if(!networkName){
-			return false;
-		}
-	}
 
 	var newNetwork = $("#network_0").clone(false)
 		.attr('id', 'network_' + lastNetworkId)
 		.attr('value', lastNetworkId)
-		.attr('aria-labelledby', 'networkTab_' + lastNetworkId)
 		.show();
+
+	newNetwork.attr('aria-labelledby', 'networkTab_' + lastNetworkId);
 
 	//Changing the unique IDs of the layout. Could be automated in one line probably
 	newNetwork.find("#networkLayout_0").attr('id', 'networkLayout_' + lastNetworkId);

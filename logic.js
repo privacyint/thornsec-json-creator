@@ -50,13 +50,18 @@ $( function() {
 	        var newNetwork = createNetwork($('#network_name').val());
 
 	        $.extend(defaultServerData, wizardNetworkData);
-	        console.log(defaultServerData);
 
 	        //copy datas from input to the freshly created network
 	        $('#networkLayout_' + lastNetworkId).data('settings', defaultServerData);
 
 	        //clean the default
 	        defaultServerData = new Machine('', '');
+	        wizardNetworkData = new Network('');
+
+	        //ugly reset because Jquery Steps is abandonned and doesn't have one
+	        wizardForm.steps('previous');
+	        wizardForm.steps('previous');
+	        wizardForm.steps('previous');
 	    }
     });
 
@@ -104,7 +109,6 @@ function updateDetailsPane(device, networkId) {
 		//check if the param is required
 		var required = '';
 		if($.inArray(setting, mandatoryFields) !== -1){
-			console.log('mandatory!');
 			required = 'required';
 		}
 

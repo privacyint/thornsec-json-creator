@@ -92,7 +92,7 @@ function UserDevice(name) {
 }
 
 //List of mandatory fields to give visual info + force fields validation
-var mandatoryFields = ['name', 'ip', 'gpg', 'adminemail', 'domain', 'profiles', 'metal', 'macs','extiface','extconnetion'];
+var mandatoryFields = ['name', 'ip', 'gpg', 'adminemail', 'domain', 'profiles', 'metal', 'macs','extiface','extconnetion', 'macs'];
 
 inheritPrototype(Router, Machine);
 inheritPrototype(Metal, Machine);
