@@ -183,7 +183,7 @@ function importJson(event) {
 	fr.onload = function(file){
 		//Should add a check to make sure it's a json file
 
-		json = $.parseJSON(file.target.result)
+		json = $.parseJSON(stripJsonComments(file.target.result));
    		//processing
 		processJson(json);
 	};
