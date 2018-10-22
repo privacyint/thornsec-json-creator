@@ -1,15 +1,15 @@
-function generateJson(){
+//By default save to JSON file and propose export
+function saveConfig(exportType){
 
 	var network = {};
 
 	for(i=1;i<=lastNetworkId;i++){
 		//Get the network properties
-		console.log($('#networkLayout_' + i));
 		var tmpNetwork = $('#networkLayout_' + i).data('settings');
 		var networkName = tmpNetwork.name.slice(0);
-		delete tmpNetwork.name;
 		
 		network[networkName] = $.extend({}, tmpNetwork);
+		delete network.name;
 
 		//prepare the user bit of the json
 		var users = {};
@@ -17,8 +17,9 @@ function generateJson(){
 			//Put the user in an object with its own name
 			var tmpUser = $(device).data('settings');
 			var name = tmpUser.name.slice(0);
-			delete tmpUser.name;
+			
 			users[name] = copyParams(tmpUser);
+			delete users.name;
 		});
 
 		//Getting devices
@@ -27,13 +28,15 @@ function generateJson(){
 		$('#deviceLayout_' + i).children().each(function(key, device){
 			var tmpDevice = $(device).data('settings');
 			var deviceName = tmpDevice.name.slice(0);
-			delete tmpDevice.name;
 
 			if($(device).hasClass('internalonly')){
 				internalDevices[deviceName] = copyParams(tmpDevice);
+				delete internalDevices.name;
 			}else{
 				externalDevices[deviceName] = copyParams(tmpDevice);
+				delete externalDevices.name;
 			}
+
 		});
 
 		//Doing the servers/router/vms
@@ -42,17 +45,17 @@ function generateJson(){
 			if($(device).hasClass('router')){
 				var tmpDevice = $(device).data('settings');
 				var deviceName = tmpDevice.name.slice(0);
-				delete tmpDevice.name;
 
 				servers[deviceName] = copyParams(tmpDevice);
+				delete servers.name;
 			}
 
 			if($(device).hasClass('metal')){
 				var tmpDevice = $(device).data('settings');
 				var deviceName = tmpDevice.name.slice(0);
-				delete tmpDevice.name;
 
 				servers[deviceName] = copyParams(tmpDevice);
+				delete servers.name;
 
 				//Cycle through VMs and router inside a server
 				$(device).children().each(function(vmKey, VM){
@@ -62,7 +65,6 @@ function generateJson(){
 						var tmpVM = $(VM).data('settings');
 						var VMName = tmpVM.name.slice(0);
 
-						delete tmpVM.name;
 						//If the router is on the server, we combine them
 						if($(VM).hasClass('router')){
 							servers[deviceName] = copyParams(tmpVM);
@@ -73,6 +75,7 @@ function generateJson(){
 							//put the server name as the metal param of the VM
 							servers[VMName]['metal']= deviceName;
 						}
+						delete servers.name;
 					}
 				})
 
@@ -86,25 +89,30 @@ function generateJson(){
 		network[networkName]['users'] = users;
 	}
 
-	//Create a hidden button to download the json 
-	var uri = 'data:text/csv;charset=utf-8,' + JSON.stringify(network);
+	//By default export a file, but this method can also be used to save the config in a cookie
+	if(exportType == 'cookie'){
+		Cookies.set('config', JSON.stringify(network));
+	}else{
+		//Create a hidden button to download the json 
+		var uri = 'data:text/csv;charset=utf-8,' + JSON.stringify(network);
 
-    var link = document.createElement("a");    
-    link.href = uri;
-    link.style = "visibility:hidden";
-    link.download = "my_thornsec_config.json";
+	    var link = document.createElement("a");    
+	    link.href = uri;
+	    link.style = "visibility:hidden";
+	    link.download = "my_thornsec_config.json";
 
 
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+	    document.body.appendChild(link);
+	    link.click();
+	    document.body.removeChild(link);
+	}
 }
 
 //Copy function is necessary to avoid copying null values
 function copyParams(source){
 	var destination = {};
 	$.each(source, function(key, value){
-		if(value){
+		if(value && !$.isEmptyObject(value)){
 			destination[key] = value;
 		}
 	})

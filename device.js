@@ -65,7 +65,11 @@ function createDevice(device, parent, name, parameters){
 		newDiv.data('settings')['types'] = ['metal'];
 	}
 	else if (device == 'service') { 
-		newDiv.html('<div class="card-header">' + name + '<i> (' + networkDevices.service + ')</i></div>');
+		var serviceType = networkDevices.service;
+		if(parameters && parameters['profiles']){
+			serviceType = parameters['profiles'];
+		}
+		newDiv.html('<div class="card-header">' + name + '<i> (' + serviceType + ')</i></div>');
 		newDiv.data('settings', serverInheritDefault(new Service(name, subnet), parent));
 		newDiv.data('settings')['types'] = ['service'];
 	}
@@ -104,12 +108,14 @@ function createDevice(device, parent, name, parameters){
 		createServer(newDiv);
 	}
 
+	saveConfig('cookie');
+
 	parent.append(newDiv);
 	updateDetailsPane(newDiv);
 }
 
 function createServer(server){
-	//Add the option to add VM or router to a server
+	//Add the option to add VM, proxy or router to a server
 	$.each(serverDevices, function(key, val) {
 		$('<div class="btn btn-info server-device p-1 m-1"><div>Add ' + val + '</div>')
 		.appendTo(server.children('.metalLayout'))

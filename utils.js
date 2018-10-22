@@ -1,3 +1,5 @@
+//Credits to https://github.com/sindresorhus/strip-json-comments
+
 'use strict';
 const singleComment = 1;
 const multiComment = 2;

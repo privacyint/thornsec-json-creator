@@ -6,8 +6,8 @@ var networkDevices = { 'router'  :'Router',
 					   'user'    :'User'
 					 };
 
-var serverDevices = { 'router'  :'Router',
-					   'service' :'VM',
+var serverDevices = {  'router'   :'Router',
+					   'service'  :'VM'
 					 };
 
 var networkData = new Network('');
@@ -25,60 +25,88 @@ $( function() {
 	});
 
 	$("#exportButton").click(function(){
-	    generateJson();
+	    saveConfig();
 	});
 
-    //Show the wizard!
-    var wizardModal = $('#wizard-modal').modal('show');
-    var wizardForm = $('#wizard-form');
-    wizardForm.steps({
-        headerTag: 'h2',
-        bodyTag: 'section',
-        transitionEffect: 'slideLeft',
-        stepsOrientation: 'vertical',
-        onStepChanging: function (event)
-	    {
-	        wizardForm.validate().settings.ignore = ":disabled,:hidden";
-	        return wizardForm.valid();
-	    },
-        onFinishing: function (event, currentIndex){
-	        return wizardForm.valid();
-	    },
-	    onFinished: function (event, currentIndex){
-	        wizardModal.modal('hide');
-	        //Create new network when ckicking finish
-	        var newNetwork = createNetwork($('#network_name').val());
+	//Check if there is a config in cookie
+	if(Cookies.get('config')){
+		processJson($.parseJSON(stripJsonComments(Cookies.get('config'))));
+	}else{
+	    //Show the wizard!
+	    var wizardModal = $('#wizard-modal').modal('show');
+	    var wizardForm = $('#wizard-form');
+	    wizardForm.steps({
+	        headerTag: 'h2',
+	        bodyTag: 'section',
+	        transitionEffect: 'slideLeft',
+	        stepsOrientation: 'vertical',
+	        onStepChanging: function (event)
+		    {
+		        wizardForm.validate().settings.ignore = ":disabled,:hidden";
+		        return wizardForm.valid();
+		    },
+	        onFinishing: function (event, currentIndex){
+		        return wizardForm.valid();
+		    },
+		    onFinished: function (event, currentIndex){
+		        wizardModal.modal('hide');
 
-	        $.extend(defaultServerData, wizardNetworkData);
+		        //Create new network when ckicking finish
+		        var newNetwork = createNetwork($('#network_name').val());
 
-	        //copy datas from input to the freshly created network
-	        $('#networkLayout_' + lastNetworkId).data('settings', defaultServerData);
+		        $.extend(defaultServerData, wizardNetworkData);
 
-	        //clean the default
-	        defaultServerData = new Machine('', '');
-	        wizardNetworkData = new Network('');
+		        //setting the right format for some params
+		        if (!$.isArray(defaultServerData['dns'])){
+		        	defaultServerData['dns'] = defaultServerData['dns'].split(';');	        
+		        }
+		        delete defaultServerData['subnet'];
 
-	        //ugly reset because Jquery Steps is abandonned and doesn't have one
-	        wizardForm.steps('previous');
-	        wizardForm.steps('previous');
-	        wizardForm.steps('previous');
-	    }
-    });
+		        //copy datas from input to the freshly created network
+		        $('#networkLayout_' + lastNetworkId).data('settings', defaultServerData);
+
+		        //clean the default
+		        defaultServerData = new Machine('', '');
+		        wizardNetworkData = new Network('');
+
+		        //ugly reset because Jquery Steps is abandonned and doesn't have one
+		        wizardForm.steps('previous');
+		        wizardForm.steps('previous');
+		        wizardForm.steps('previous');
+
+		        //Cleaning basic values of the forms
+		        $('#network_name').val('');
+		        $('#network_domain').val('');
+		    }
+	    });
+	}
 
 	$('#networkDefaultsForm').on('input', function(e) {
 		var property = ((e.target.id).split('_')[1]);
-		wizardNetworkData[property] = e.target.value;
+		if(e.target.type == "checkbox"){
+			wizardNetworkData[property] = e.target.checked;
+		}else{
+			wizardNetworkData[property] = e.target.value;
+		}
 	});
 
 	//populating the defaultServerData with pre-entered info
-	$('#serverDefaultsForm :input').each(function(e) {
+	$('#serverDefaultsForm :input').not(':input[type=button]').each(function(e) {
 		var property = (this.id.split('_')[1]);
-		defaultServerData[property] = $(this).val();
+		if($(this)[0].type == "checkbox"){
+			defaultServerData[property] = $(this)[0].checked;
+		}else{
+			defaultServerData[property] = $(this).val();
+		}
 	});
 
 	$('#serverDefaultsForm').on('input', function(e) {
 		var property = ((e.target.id).split('_')[1]);
-		defaultServerData[property] = e.target.value;
+		if(e.target.type == "checkbox"){
+			defaultServerData[property] = e.target.checked;
+		}else{
+			defaultServerData[property] = e.target.value;
+		}
 	});
 
 	// $('[title]').tooltip({
@@ -133,6 +161,17 @@ function updateDetailsPane(device, networkId) {
 					}
 				}
 			})
+
+			//updating object when adding and removing items
+			$('#textbox_' + device.attr('id') + '_' + setting).on('itemAdded', function(e) {
+				$(device).data('settings')[setting] = $('#textbox_' + device.attr('id') + '_' + setting).val();
+				saveConfig('cookie');
+			});
+
+			$('#textbox_' + device.attr('id') + '_' + setting).on('itemRemoved', function(e) {
+				$(device).data('settings')[setting] = $('#textbox_' + device.attr('id') + '_' + setting).val();
+				saveConfig('cookie');
+			});
 		}
 		else {
 			settingTextBox.after().html('<label>' + setting + ': </label><input class="settingInput ' + required + '" type="text" name="textbox_' + setting + '" id="textbox_' + setting + '" value="' + val + '" >');
@@ -140,6 +179,7 @@ function updateDetailsPane(device, networkId) {
 			//update device's setting when modified
 			settingTextBox.on('input', 'input', function(e) {
 				$(device).data('settings')[setting] = this.value;
+				saveConfig('cookie');
 			});
 
 			settingTextBox.appendTo('#infoPane_' + networkId);

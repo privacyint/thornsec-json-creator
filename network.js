@@ -59,6 +59,8 @@ function deleteAllNetworks(){
 		return false;
 	}
 
+	Cookies.remove('config')
+
 	for(i=1;i<=lastNetworkId;i++){
 		deleteNetwork(i);
 	}

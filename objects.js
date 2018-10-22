@@ -15,7 +15,7 @@ function Network(name) {
 	this.adblocking       = false;     //Optional
 	this.autogenpasswords = false;     //Optional
 	this.vpnonly          = false;     //Optional
-	this.dns              = '8.8.8.8'; //Optional
+	this.dns              = ["8.8.8.8"]; //Optional
 }
 
 function Machine(name, subnet) {
