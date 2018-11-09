@@ -59,10 +59,16 @@ function deleteAllNetworks(){
 		return false;
 	}
 
-	Cookies.remove('config')
+	Cookies.remove('config');
 
 	for(i=1;i<=lastNetworkId;i++){
 		deleteNetwork(i);
+		
+		//cleaning cookies
+		Cookies.remove('network_servers_' + i);		
+		Cookies.remove('network_internalonly_' + i);		
+		Cookies.remove('network_externalonly_' + i);		
+		Cookies.remove('network_users_' + i);		
 	}
 
 	//reinitialize count
@@ -98,5 +104,11 @@ function deleteNetwork(id){
     	'settings', networkData
     )
 
-    lastNetworkId--;
+    //cleaning cookies
+    //cleaning cookies
+	Cookies.remove('network_servers_' + id);		
+	Cookies.remove('network_internalonly_' + id);		
+	Cookies.remove('network_externalonly_' + id);		
+	Cookies.remove('network_users_' + id);	
+
 }

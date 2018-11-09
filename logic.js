@@ -28,9 +28,23 @@ $( function() {
 	    saveConfig();
 	});
 
+	$("#saveButton").click(function(){
+	    saveConfig('cookie');
+	});
+
 	//Check if there is a config in cookie
 	if(Cookies.get('config')){
-		processJson($.parseJSON(stripJsonComments(Cookies.get('config'))));
+		var savedNetworks = Cookies.get('config');
+		var savedConfig = {};
+		//we need to rebuild the object from saved info
+		for(i=1;i<=savedNetworks;i++){
+			savedConfig[$.parseJSON(Cookies.get('network_name_' + i))] = {};
+			savedConfig[$.parseJSON(Cookies.get('network_name_' + i))]['servers'] = JSONC.decompress($.parseJSON(Cookies.get('network_servers_' + i)));
+			savedConfig[$.parseJSON(Cookies.get('network_name_' + i))]['internalonly'] = JSONC.decompress($.parseJSON(Cookies.get('network_internalonly_' + i)));
+			savedConfig[$.parseJSON(Cookies.get('network_name_' + i))]['externalonly'] = JSONC.decompress($.parseJSON(Cookies.get('network_externalonly_' + i)));
+			savedConfig[$.parseJSON(Cookies.get('network_name_' + i))]['users'] = JSONC.decompress($.parseJSON(Cookies.get('network_users_' + i)));
+		}
+		processJson(savedConfig);
 	}else{
 	    //Show the wizard!
 	    var wizardModal = $('#wizard-modal').modal('show');
@@ -154,11 +168,12 @@ function updateDetailsPane(device, networkId) {
 					$('#textbox_' + device.attr('id') + '_' + setting).tagsinput('add', v);
 				}else{
 					//Tihs is for settings which object inside arrays. We deal with it differently according to what it is
-					if(v.destination){
+					//NOT FOR NOW, KILLING COOKIES
+					/*if(v.destination){
 						$('#textbox_' + device.attr('id') + '_' + setting).tagsinput('add', v.destination + ':' + v.ports);	
-					}else{
-						$('#textbox_' + device.attr('id') + '_' + setting).tagsinput('add', JSON.stringify(v));	
-					}
+					}else{*/
+					$('#textbox_' + device.attr('id') + '_' + setting).tagsinput('add', JSON.stringify(v));	
+					
 				}
 			})
 

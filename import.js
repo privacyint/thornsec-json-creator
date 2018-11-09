@@ -37,7 +37,10 @@ function processJson(json){
 										if(key == 'extconfig' || key == 'extconnection' || key == 'extiface'){
 											router[key] = value.slice(0);
 											delete subDevice[key];
-										}										
+										}								
+										if(key == 'subnet'){
+											router[key] = value;
+										}		
 									})									
 									createDevice('metal', newNetwork, subDeviceKey, subDevice);
 									createDevice('router', $('#' + subDeviceKey), 'router', router);

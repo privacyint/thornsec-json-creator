@@ -108,8 +108,6 @@ function createDevice(device, parent, name, parameters){
 		createServer(newDiv);
 	}
 
-	saveConfig('cookie');
-
 	parent.append(newDiv);
 	updateDetailsPane(newDiv);
 }
@@ -155,6 +153,8 @@ function deleteDevice(device, networkId)
 	if(device.hasClass('router')){
 		$('#addRouterBtn_' + networkId).removeClass('disabled');
 	}
+
+	saveConfig('cookie');
 }
 
 function serverInheritDefault(server, network) {
