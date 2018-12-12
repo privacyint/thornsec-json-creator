@@ -18,6 +18,8 @@ var defaultServerData = new Machine('', '');
 
 var lastNetworkId = 0;
 
+var networkOptions = [] ;
+
 $( function() {
 	//Import button triggers file select which will parse the file
     $("#importButton").click(function(){
@@ -31,6 +33,13 @@ $( function() {
 	$("#saveButton").click(function(){
 	    saveConfig('cookie');
 	});
+
+	//Create default values for MAC and subnet enabling autopopulate
+	networkOptions['network_0'] = {	'autoMacAddress' : true,
+									'autoSubnet' : true,
+									'defaultMacAddress': '08:00:27:00:00:00',
+									'lastSubnet' : 0,
+									'lastMac' :  '08:00:27:00:00:00' };
 
 	//Check if there is a config in cookie
 	if(Cookies.get('config')){
@@ -122,6 +131,7 @@ $( function() {
 			defaultServerData[property] = e.target.value;
 		}
 	});
+
 
 	// $('[title]').tooltip({
 	// 	position: {

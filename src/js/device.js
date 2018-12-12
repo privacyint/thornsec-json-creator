@@ -1,4 +1,8 @@
-function createDevice(device, parent, name, parameters){
+function createDevice(device, parent, name, parameters, wizard){
+	if(wizard){
+		$('#addDeviceModal').modal('show');
+	}
+
 	//Parents can be the layout or a metal. If it's a metal we need to find on which network it is
 	if(parent.hasClass('metal')){
 		var networkId = parent.parent().attr('id').slice(-1);
@@ -15,12 +19,34 @@ function createDevice(device, parent, name, parameters){
 
 	//If there is no params we ask the basics
 	if(!parameters){
-		var name = prompt('give me a name!');
-		//Cancel if no name entered
-		if(name == null || name == ""){ return false;}
+		if(!wizard){
+			var name = prompt('give me a name!');
+			//Cancel if no name entered
+			if(name == null || name == ""){ return false;}
+		}			
 
+		//This handles auto increment of subnet and mac for the network
 		if(device == ('router') || device == ('metal') || device == ('service')){
-			var subnet = prompt('give me a subnet!');
+			if(networkOptions['network_' + networkId].autoSubnet){
+				//increment last subnet
+				var tmpSubnet = networkOptions['network_' + networkId].lastSubnet;
+				tmpSubnet++;
+				//needs to be put into quote to make it a string
+				var subnet = "" + tmpSubnet + "";
+			}else{
+				var subnet = prompt('give me a subnet!');
+			}
+
+			if(networkOptions['network_' + networkId].autoMacAddress){
+				//incrementing mac address by converting last 2 digits to int and then back to hex
+				var macAddressInt = parseInt(networkOptions['network_' + networkId].lastMac.slice(-2), 16);
+				macAddressInt++;
+				var macAddressHex = macAddressInt.toString(16);
+				if(macAddressHex.length == 1){
+					macAddressHex = '0' + macAddressHex;
+				} 
+				var tmpMacAddress = networkOptions['network_' + networkId].lastMac.slice(0,15) + macAddressHex;				
+			}
 		}
 	}
 
@@ -96,6 +122,15 @@ function createDevice(device, parent, name, parameters){
 		})
 	}
 
+	if(tmpMacAddress && (device == ('router') || device == ('metal') || device == ('service'))){
+		newDiv.data('settings')['mac'] = tmpMacAddress;
+	}
+
+	//If the device is a server  allow creation of service and router on it
+	if(newDiv.hasClass('metal')){
+		createServer(newDiv);
+	}
+
 	//Make the new device selectable
 	newDiv.on('click', function() {
 		updateDetailsPane($(this), networkId);
@@ -103,14 +138,63 @@ function createDevice(device, parent, name, parameters){
 		return false;
     });
 
-	//If the device is a server  allow creation of service and router on it
-	if(newDiv.hasClass('metal')){
-		createServer(newDiv);
+
+	//If the creations come from import we create immediatly, if not we wait for the signal from the save button
+	if(!wizard){
+		finalizeDevice(newDiv, parent, networkId, tmpSubnet, tmpMacAddress);
+	}else{
+		//update when a parameter is edited
+		$('#addDevice').on('input', function(e) {
+			var property = ((e.target.id).split('_')[1]);
+			newDiv.data('settings')[property] = e.target.value;
+			if(property == "name"){
+				newDiv.find(".card-header").html(e.target.value + " (VM)");
+			}
+		});
+
+		//delete device if modal is closed
+		$('#addDeviceModal').on('hidden.bs.modal', function (e) {
+			$("#addDevicePreview").html('');
+		  	delete newDiv;
+		  	return false;
+		})
+
+		//populate modal
+
+
+		//append to modal for preview
+		$("#addDevicePreview").append(newDiv);
+
+		//When saving, update object properties and attach to network
+		$('#addDeviceSaveButton').click(function(){
+			//update device info based on modal info
+			$("#addDevice :input").each(function(){
+				var property = ((this.id).split('_')[1]);
+				newDiv.data('settings')[property] = this.value;
+			});
+			finalizeDevice(newDiv, parent, networkId, tmpSubnet, tmpMacAddress);
+		});
 	}
 
-	parent.append(newDiv);
-	updateDetailsPane(newDiv);
 }
+
+function finalizeDevice(device, parent, networkId, tmpSubnet, tmpMacAddress){
+	//update network options values in modal and object
+	if(tmpSubnet){
+		networkOptions['network_' + networkId].lastSubnet++;
+		updateNetworkOptions(networkId, 'lastSubnet', networkOptions['network_' + networkId].lastSubnet++);
+	}
+	if(tmpMacAddress){		
+		networkOptions['network_' + networkId].lastMac = tmpMacAddress;
+		updateNetworkOptions(networkId, 'lastMac', networkOptions['network_' + networkId].lastMac);	
+	}
+
+	saveConfig('cookie');
+
+	parent.append(device);
+	updateDetailsPane(device);
+}
+
 
 function createServer(server){
 	//Add the option to add VM, proxy or router to a server
@@ -120,7 +204,7 @@ function createServer(server){
 		.addClass(key)
 		.addClass('model')
 		.click(function(event){
-			createDevice(key, server);
+			createDevice(key, server, null, null, true);
 		});
 	});	
 
@@ -159,7 +243,6 @@ function deleteDevice(device, networkId)
 
 function serverInheritDefault(server, network) {
 	//IS THIS ACTUALLY USEFUL?
-
 	var skip = [ 'name',
 				 'subnet'
 			   ];

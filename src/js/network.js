@@ -6,6 +6,14 @@ function createNetwork(networkName){
 		.attr('value', lastNetworkId)
 		.show();
 
+	//clone options modal
+	var newNetworkOptionsModal = $("#optionsModal_0").clone(false)
+		.attr('id', 'optionsModal_' + lastNetworkId)
+		.show();
+
+	//Clone the default autoParams object to auto increment subnet and mac values automatically
+	networkOptions['network_' + lastNetworkId] = $.extend({}, networkOptions['network_0']);
+
 	newNetwork.attr('aria-labelledby', 'networkTab_' + lastNetworkId);
 
 	//Changing the unique IDs of the layout. Could be automated in one line probably
@@ -14,11 +22,25 @@ function createNetwork(networkName){
 	newNetwork.find("#deviceLayout_0").attr('id', 'deviceLayout_' + lastNetworkId);
 	newNetwork.find("#infoPane_0").attr('id', 'infoPane_' + lastNetworkId);
 	newNetwork.find("#addRouterBtn_0").attr('id', 'addRouterBtn_' + lastNetworkId);
+	newNetwork.find("#optionsButton_0").attr('id', 'optionsButton_' + lastNetworkId).attr('data-target', '#optionsModal_' + lastNetworkId);
 
 	var newNetworkTab = '<li class="nav-item"><a class="nav-link" id="networkTab_' + lastNetworkId + '" data-toggle="tab" href="#network_' + lastNetworkId + '" role="tab" aria-controls="home" aria-selected="true">' + networkName + '</a></li>';
 
 	$('#networksContent').append(newNetwork);
 	$('#networkTabAdd').before(newNetworkTab);
+	$('.container').append(newNetworkOptionsModal);
+
+	
+	//Listening to options changes
+	$('#optionsModal_' + lastNetworkId).on('input', function(e) {
+		var property = ((e.target.id).split('_')[1]);
+		if(e.target.type == "checkbox"){
+			networkOptions['network_' + lastNetworkId][property] = e.target.checked;
+		}else{
+			networkOptions['network_' + lastNetworkId][property] = e.target.value;
+		}
+	});
+
 
 	initNetwork($('#networkLayout_' + lastNetworkId));
 
@@ -52,6 +74,10 @@ function initNetwork(network){
     	//if(e.target != this) return;
 		updateDetailsPane(network, network.attr('id').slice(-1));
     });
+}
+
+function updateNetworkOptions(networkId, option, value){
+	$("#optionsModal_" + networkId).find("#options_" + option).attr('value', value);
 }
 
 function deleteAllNetworks(){

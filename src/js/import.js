@@ -29,6 +29,11 @@ function processJson(json){
 								}else{
 									createDevice('service', $('#' + subDevice.metal), subDeviceKey, subDevice);
 								}
+								//Updating the last subnet 
+								if(subDevice.subnet > networkOptions['network_' + lastNetworkId].lastSubnet){
+									networkOptions['network_' + lastNetworkId].lastSubnet = subDevice.subnet;
+									updateNetworkOptions(lastNetworkId, 'lastSubnet', subDevice.subnet);
+								}
 							}else{
 								//if router in on server
 								if(($.inArray("router", subDevice.types) !== -1) && ($.inArray("metal", subDevice.types) !== -1)){
@@ -46,8 +51,6 @@ function processJson(json){
 									createDevice('router', $('#' + subDeviceKey), 'router', router);
 								}
 							}
-							//console.log(subDevice.types[0]);
-							//createDevice('metal', '', paramsKey, params);
 						})	
 						break;
 					case 'users':

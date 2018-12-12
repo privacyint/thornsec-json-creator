@@ -86,8 +86,8 @@ function saveConfig(exportType){
 
 			//Copying to the master object
 			network[networkName]['servers'] = servers;
-			network[networkName]['internalonly'] = internalDevices;
-			network[networkName]['externalonly'] = externalDevices;
+			network[networkName]['internaldevices'] = internalDevices;
+			network[networkName]['externaldevices'] = externalDevices;
 			network[networkName]['users'] = users;
 
 

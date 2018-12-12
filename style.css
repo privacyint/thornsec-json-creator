@@ -147,18 +147,24 @@ h1, h2, h3, h4 {
   position: relative;
 }
 
-label {
+#wizard-form label {
   display: inline-block;
   width: 35%;
   text-align: left;
   vertical-align: center;
 }
 
-.settingInput{
-  width: 60%;
+#networksContent label{
+  display: inline-block;
+  width: 35%;
+  text-align: left;
+  vertical-align: center;
 }
 
 
+.settingInput{
+  width: 60%;
+}
 
 fieldset div {
   margin-bottom: 2em;

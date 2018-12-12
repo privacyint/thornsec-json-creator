@@ -25,13 +25,14 @@
 	<script src="external/bootstrap-4.1.3-dist/js/bootstrap.bundle.min.js"></script>
 	<script src="external/bootstrap-tagsinput/bootstrap-tagsinput.min.js"></script>
 
-	<script src="objects.js"></script>
-	<script src="utils.js"></script>
-	<script src="logic.js"></script>
-	<script src="import.js"></script>
-	<script src="export.js"></script>
-	<script src="network.js"></script>
-	<script src="device.js"></script>
+	<script src="src/js/objects.js"></script>
+	<script src="src/js/utils.js"></script>
+	<script src="src/js/logic.js"></script>
+	<script src="src/js/import.js"></script>
+	<script src="src/js/export.js"></script>
+	<script src="src/js/network.js"></script>
+	<script src="src/js/device.js"></script>
+
 </head>
 <body>
 	<div class="container">
@@ -44,7 +45,7 @@
 							<button class="btn btn-primary" id="importButton">Import</button>
 							<input type="file" id="configFile" onchange="importJson(event)">
 							<button class="btn btn-primary" id="exportButton">Export</button>
-							<button class="btn btn-primary" id="saveButton">Save</button>
+							<!-- <button class="btn btn-primary" id="saveButton">Save</button> -->
 						</div>
 						<div class="col-6 text-right">
 							<button class="btn btn-success" id="deleteAllButton" onclick="createNetwork()">Add Network</button>
@@ -388,8 +389,12 @@
 				</ul>
 
 				<div class="tab-content" id="networksContent">
+					<!-- NETWORK TEMPLATE-->
 					<div class="network-layout col-md-12 mb-4 text-muted bg-light rounded border tab-pane fade" role="tabpanel" aria-labelledby="networkTab_0" id="network_0" style="display:none">
-						<div class="col-md-12 mt-2 text-right"><button class="btn btn-danger" id="deleteAllButton" onclick="deleteNetwork($(this).parents().eq(1).attr('id').slice(-1))">Delete this network</button></div>
+						<div class="col-md-12 mt-2 text-right">
+							<button class="btn btn-primary" id="optionsButton_0" data-toggle="modal" data-target="#optionsModal_0">Options</button>
+							<button class="btn btn-danger" id="deleteAllButton" onclick="deleteNetwork($(this).parents().eq(1).attr('id').slice(-1))">Delete this network</button>
+						</div>
 						<div class="row">
 							<div class="col-md-8" id="network-container">
 								<div class="column">
@@ -441,6 +446,83 @@
 
 			<!-- DEFAULT DEVICE -->
 			<div id="defaultDevice" class="card text-white added bg-dark shadow " style="display: none"></div>
+
+
+			<!-- OPTIONS MODAL TEMPLATE-->
+			<div class="modal fade" id="optionsModal_0" tabindex="-1" role="dialog" aria-labelledby="optionsModalTitle" aria-hidden="true">
+				<div class="modal-dialog" role="document">
+					<div class="modal-content">
+						<div class="modal-header">
+							<h5 class="modal-title" id="optionsModalTitle">Network options</h5>
+							<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+								<span aria-hidden="true">&times;</span>
+							</button>
+						</div>
+						<div class="modal-body" id="networkOptions">
+							<div>
+								<input type="checkbox" id="options_autoMacAddress" name="options_autoMacAddress" title="Do you want the mac addresses of your VMs to be automatically generated? Incremental from 08:00:27:00:00:00" checked="checked">
+								<label for="options_autoMacAddress">Automatically generate VMs MAC addresses</label>
+							</div>
+							<div>
+								<label for="options_defaultMacAddress">Default Mac address</label>
+								<input type="text" id="options_defaultMacAddress" name="options_defaultMacAddress" title="Starting point for the MAC address auto generation" value="08:00:27:00:00:00">
+							</div>
+							<div>
+								<label for="options_lastMac">Last Mac address</label>
+								<input type="text" id="options_lastMac" name="options_lastMac" title="Last Mac Found" value="08:00:27:00:00:00">
+							</div>
+							<div>
+								<input type="checkbox" id="options_autoSubnet" name="options_autoSubnet" title="Do you want the subnet of your VMs to be automatically generated? Incremental from 1." checked="checked">
+								<label for="options_autoSubnet">Automatically generate VMs subnet</label>
+							</div>	
+							<div>
+								<label for="options_lastSubnet">Last Subnet</label>
+								<input type="text" id="options_lastSubnet" name="options_lastSubnet" title="Last subnet found" value="0">
+							</div>
+						</div>
+						<div class="modal-footer">
+							<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- ADD DEVICE WIZARD -->
+			<div class="modal fade" id="addDeviceModal" tabindex="-1" role="dialog" aria-labelledby="addDeviceModalTitle" aria-hidden="true">
+				<div class="modal-dialog" role="document">
+					<div class="modal-content">
+						<div class="modal-header">
+							<h5 class="modal-title" id="addDeviceTitle">Add VM</h5>
+							<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+								<span aria-hidden="true">&times;</span>
+							</button>
+						</div>
+						<div class="modal-body row">
+							<div class="col-md-8" id="addDevice">
+								<div class="text-center"><b>Properties</b></div>
+								<div>
+									<label for="newDevice_name">Name</label>
+									<input type="text" id="newDevice_name" name="newDevice_name" title="Device name" value="0"/>
+								</div>
+								<div>
+									<label for="newDevice_name">Profile</label>
+									<input type="text" id="newDevice_profile" name="newDevice_profile" title="Device profile" value="0"/>
+								</div>
+							</div>
+							<div class="col-md-4">
+								<div class="text-center"><b>Preview</b></div>
+								<div id="addDevicePreview">
+								</div>
+							</div>
+						</div>	
+						<div class="modal-footer">
+							<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+							<button type="button" class="btn btn-primary" data-dismiss="modal" id="addDeviceSaveButton">Save</button>
+						</div>
+					</div>
+				</div>
+			</div>
+
 		</body>
 		</html>
 
