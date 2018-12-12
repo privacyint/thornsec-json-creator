@@ -55,6 +55,12 @@ function Metal(name, subnet) {
 	this.vmbase          = null; //Optional, inherited
 }
 
+function Dedicated(name, subnet) {
+	Machine.call(this, name, subnet);
+
+	this.extiface      = null;
+}
+
 function Service(name, subnet) {
 	Machine.call(this, name, subnet);
 

@@ -24,7 +24,7 @@ function processJson(json){
 					case 'servers':
 						$.each(device, function(subDeviceKey, subDevice){
 							if(subDevice.types.length == 1){
-								if(subDevice.types[0] == "router" || subDevice.types[0] == "metal"){
+								if(subDevice.types[0] == "router" || subDevice.types[0] == "metal" || subDevice.types[0] == "dedicated"){
 									createDevice(subDevice.types[0], newNetwork, subDeviceKey, subDevice);
 								}else{
 									createDevice('service', $('#' + subDevice.metal), subDeviceKey, subDevice);

@@ -1,9 +1,10 @@
-var networkDevices = { 'router'  :'Router',
-					   'metal'   :'Server',
-					   'service' :'VM',
-					   'internal':'Internal Only Device',
-					   'external':'External Only Device',
-					   'user'    :'User'
+var networkDevices = { 'router'  	:'Router',
+					   'metal'   	:'Server',
+					   'dedicated'  :'Dedicated',
+					   'service' 	:'VM',
+					   'internal'	:'Internal Only Device',
+					   'external'	:'External Only Device',
+					   'user'    	:'User'
 					 };
 
 var serverDevices = {  'router'   :'Router',

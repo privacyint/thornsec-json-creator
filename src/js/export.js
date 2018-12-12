@@ -44,7 +44,7 @@ function saveConfig(exportType){
 			//Doing the servers/router/vms
 			var servers = {};
 			$('#networkLayout_' + i).children().each(function(key, device){
-				if($(device).hasClass('router')){
+				if($(device).hasClass('router') || $(device).hasClass('dedicated')){
 					var tmpDevice = $(device).data('settings');
 					var deviceName = tmpDevice.name.slice(0);
 

@@ -90,6 +90,11 @@ function createDevice(device, parent, name, parameters, wizard){
 		newDiv.data('settings', serverInheritDefault(new Metal(name, subnet), parent));
 		newDiv.data('settings')['types'] = ['metal'];
 	}
+	else if (device == 'dedicated') { 
+		newDiv.html('<div class="card-header">' + name + '<i> (' + networkDevices.dedicated + ')</i></div>');
+		newDiv.data('settings', serverInheritDefault(new Dedicated(name, subnet), parent));
+		newDiv.data('settings')['types'] = ['dedicated'];
+	}
 	else if (device == 'service') { 
 		var serviceType = networkDevices.service;
 		if(parameters && parameters['profiles']){
@@ -122,7 +127,7 @@ function createDevice(device, parent, name, parameters, wizard){
 		})
 	}
 
-	if(tmpMacAddress && (device == ('router') || device == ('metal') || device == ('service'))){
+	if(newDiv.data('settings')['mac'] == null && tmpMacAddress && (device == ('router') || device == ('metal') || device == ('service'))){
 		newDiv.data('settings')['mac'] = tmpMacAddress;
 	}
 
